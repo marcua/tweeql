@@ -1,10 +1,15 @@
 #!/usr/bin/env python
 
-import time
 from getpass import getpass
 from textwrap import TextWrapper
 
+import redis
 import tweepy
+
+MAX_MESSAGES = 10000
+TWEET_GROUP_ID = 'tweet-group-id'
+TO_INDEX = 'tweet-groups-to-index'
+
 
 class StreamWatcherListener(tweepy.StreamListener):
 
@@ -26,38 +31,54 @@ class StreamWatcherListener(tweepy.StreamListener):
     def on_timeout(self):
         print 'Snoozing Zzzzzz'
 
+class StreamGrabberListener(tweepy.StreamListener):
+    """
+    Manages tweets to be processed in redis.  Redis variables:
+       - variable TWEET_GROUP_ID keeps track of the largest tweet group id issued yet
+       - variable TO_INDEX is a list that stores the ids of tweet groups to be processed.
+       - variables 'tweet-group:%d" are lists of tweets to be processed (tweet groups)
+    """
+
+    def __init__(self):
+        tweepy.StreamListener.__init__(self)
+        self.redis = redis.Redis(host='localhost', port=6379, db=0)
+        self.increment_tweet_group_id()
+        
+    def increment_tweet_group_id(self):
+        self.tweet_group_id = self.redis.incr(TWEET_GROUP_ID)
+        self.tweet_group_listkey = 'tweet-group:%d' % (self.tweet_group_id)
+        
+    def on_data(self, data):
+        """
+        Push data into redis
+        """
+        if 'in_reply_to_status_id' in data:
+            self.keep_or_update_tgid()
+            self.insert_data(data)
+
+    def on_error(self, status_code):
+        print 'An error has occured! Status code = %s' % status_code
+        return True  # keep stream alive
+
+    def on_timeout(self):
+        print 'Snoozing Zzzzzz'
+    
+    def keep_or_update_tgid(self):
+        if self.redis.llen(self.tweet_group_listkey) >= MAX_MESSAGES:
+            print 'done with %s' % (self.tweet_group_listkey)
+            self.redis.lpush(TO_INDEX, self.tweet_group_listkey)
+            self.increment_tweet_group_id()
+    
+    def insert_data(self, data):
+        self.redis.rpush(self.tweet_group_listkey, data)
 
 def main():
     # Prompt for login credentials and setup stream object
     username = raw_input('Twitter username: ')
     password = getpass('Twitter password: ')
-    stream = tweepy.Stream(username, password, StreamWatcherListener(), timeout=None)
+    stream = tweepy.Stream(username, password, StreamGrabberListener(), timeout=None)
 
-    # Prompt for mode of streaming
-    valid_modes = ['sample', 'filter']
-    while True:
-        mode = raw_input('Mode? [sample/filter] ')
-        if mode in valid_modes:
-            break
-        print 'Invalid mode! Try again.'
-
-    if mode == 'sample':
-        stream.sample()
-
-    elif mode == 'filter':
-        follow_list = raw_input('Users to follow (comma separated): ').strip()
-        track_list = raw_input('Keywords to track (comma seperated): ').strip()
-        if follow_list:
-            follow_list = [u for u in follow_list.split(',')]
-        else:
-            follow_list = None
-        if track_list:
-            track_list = [k for k in track_list.split(',')]
-        else:
-            track_list = None
-
-        stream.filter(follow_list, track_list)
-
+    stream.sample()
 
 if __name__ == '__main__':
     try:
