@@ -1,3 +1,5 @@
+from private_settings import *
+
 REDIS_HOSTNAME = 'localhost'
 REDIS_PORT = 6379
 REDIS_DB = 0
