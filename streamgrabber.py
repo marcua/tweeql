@@ -1,35 +1,9 @@
 #!/usr/bin/env python
 
-from getpass import getpass
-from textwrap import TextWrapper
-
+import getpass
 import redis
 import tweepy
-
-MAX_MESSAGES = 10000
-TWEET_GROUP_ID = 'tweet-group-id'
-TO_INDEX = 'tweet-groups-to-index'
-
-
-class StreamWatcherListener(tweepy.StreamListener):
-
-    status_wrapper = TextWrapper(width=60, initial_indent='    ', subsequent_indent='    ')
-
-    def on_status(self, status):
-        try:
-            print self.status_wrapper.fill(status.text)
-            print '\n %s  %s  via %s\n' % (status.author.screen_name, status.created_at, status.source)
-        except:
-            # Catch any unicode errors while printing to console
-            # and just ignore them to avoid breaking application.
-            pass
-
-    def on_error(self, status_code):
-        print 'An error has occured! Status code = %s' % status_code
-        return True  # keep stream alive
-
-    def on_timeout(self):
-        print 'Snoozing Zzzzzz'
+import settings
 
 class StreamGrabberListener(tweepy.StreamListener):
     """
@@ -41,11 +15,11 @@ class StreamGrabberListener(tweepy.StreamListener):
 
     def __init__(self):
         tweepy.StreamListener.__init__(self)
-        self.redis = redis.Redis(host='localhost', port=6379, db=0)
+        self.redis = redis.Redis(host=settings.REDIS_HOSTNAME, port=settings.REDIS_PORT, db=settings.REDIS_DB)
         self.increment_tweet_group_id()
         
     def increment_tweet_group_id(self):
-        self.tweet_group_id = self.redis.incr(TWEET_GROUP_ID)
+        self.tweet_group_id = self.redis.incr(settings.TWEET_GROUP_ID)
         self.tweet_group_listkey = 'tweet-group:%d' % (self.tweet_group_id)
         
     def on_data(self, data):
@@ -64,9 +38,9 @@ class StreamGrabberListener(tweepy.StreamListener):
         print 'Snoozing Zzzzzz'
     
     def keep_or_update_tgid(self):
-        if self.redis.llen(self.tweet_group_listkey) >= MAX_MESSAGES:
+        if self.redis.llen(self.tweet_group_listkey) >= settings.MAX_MESSAGES:
             print 'done with %s' % (self.tweet_group_listkey)
-            self.redis.lpush(TO_INDEX, self.tweet_group_listkey)
+            self.redis.lpush(settings.TO_INDEX, self.tweet_group_listkey)
             self.increment_tweet_group_id()
     
     def insert_data(self, data):
@@ -75,7 +49,7 @@ class StreamGrabberListener(tweepy.StreamListener):
 def main():
     # Prompt for login credentials and setup stream object
     username = raw_input('Twitter username: ')
-    password = getpass('Twitter password: ')
+    password = getpass.getpass('Twitter password: ')
     stream = tweepy.Stream(username, password, StreamGrabberListener(), timeout=None)
 
     stream.sample()
