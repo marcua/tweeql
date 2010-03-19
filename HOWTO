@@ -1,0 +1,9 @@
+CREATE USER Tweeter ENCRYPTED PASSWORD '$$$$$$PASSWD$$$$$$';
+CREATE DATABASE tweets WITH ENCODING 'UNICODE' OWNER = Tweeter;
+psql -d tweets
+CREATE TABLE tweets (
+  author_id BIGINT,
+  created_at DATETIME,
+  tweet VARCHAR(140),
+  retweeted BOOLEAN
+);
