@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
-import settings
 import csv
+import psycopg2
 import redis
+import settings
 import tempfile
 import time
 
@@ -14,11 +15,10 @@ from tweepy.utils import convert_to_utf8_str
 api = API()
 json = import_simplejson()
 
-def bulk_load(tweets, db):
-#    with tempfile.NamedTemporaryFile(mode='w') as tmpfile:
-    with open('/tmp/testtweets', 'w') as tmpfile:
+def bulk_load(listkey, tweets, db):
+    with tempfile.NamedTemporaryFile(mode='w') as tmpfile:
         writer = csv.writer(tmpfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
-        print "file %s" % (tmpfile.name)
+        print "list key '%s', file '%s'" % (listkey, tmpfile.name)
         for jsontweet in tweets:
             tweet = Status.parse(api, json.loads(jsontweet))
             retweeted = (getattr(tweet, 'retweeted_status', None) != None)
@@ -29,16 +29,14 @@ def bulk_load(tweets, db):
         copy_cmd = "COPY tweets (author_id, created_at, text, retweeted) FROM STDIN WITH DELIMITER AS ',' CSV QUOTE AS '\"'"
         cur = db.cursor()
         cur.copy_expert(copy_cmd, tmpfile)
-        
-        
 
 def poll_data(r, db):
-    listkey = r.lindex(settings.TO_INDEX, -1)#r.rpoplpush(settings.TO_INDEX, settings.CONSUMED_INDICES)
+    listkey = r.rpoplpush(settings.TO_INDEX, settings.CONSUMED_INDICES)
     if listkey != None:
         tweets = r.lrange(listkey, 0, -1)
-        bulk_load(tweets, db)
-        #r.lrem(CONSUMED_INDICES, 0, listkey)
-        #r.del(listkey)
+        bulk_load(listkey, tweets, db)
+        r.lrem(settings.CONSUMED_INDICES, listkey, 0)
+        r.delete(listkey)
 
 def main():
     r = redis.Redis(host=settings.REDIS_HOSTNAME, port=settings.REDIS_PORT, db=settings.REDIS_DB)
