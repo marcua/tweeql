@@ -24,7 +24,7 @@ def gen_tuple(jsontweet):
     return (tweet.author.id, tweet.created_at, convert_to_utf8_str(tweet.text), retweeted)
     
 def bulk_load(listkey, tweets, db):
-    print "list key '%s'" % (listkey)
+    print "bulk-loading %d tweets from '%s'" % (len(tweets), listkey)
     insert_cmd = "INSERT INTO tweets (author_id, created_at, tweet, retweeted) VALUES (%s, %s, %s, %s);"
     cur = db.cursor()
     cur.executemany(insert_cmd, (gen_tuple(jsontweet) for jsontweet in tweets))

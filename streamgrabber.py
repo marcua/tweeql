@@ -39,7 +39,7 @@ class StreamGrabberListener(tweepy.StreamListener):
     
     def keep_or_update_tgid(self):
         if self.redis.llen(self.tweet_group_listkey) >= settings.MAX_MESSAGES:
-            print 'done with %s' % (self.tweet_group_listkey)
+            print 'grabbed another %d tweets in %s' % (settings.MAX_MESSAGES, self.tweet_group_listkey)
             self.redis.lpush(settings.TO_INDEX, self.tweet_group_listkey)
             self.increment_tweet_group_id()
     
