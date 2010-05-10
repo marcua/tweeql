@@ -1,1 +1,9 @@
 SELECT brand(tweet), sentiment(tweet) FROM twitter AS tweet;
+
+LICENSE
+-------
+
+REQUIREMENTS
+------------
+tweepy
+pyparsing
