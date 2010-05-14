@@ -3,6 +3,7 @@ from ssql.operators import StatusSource
 from ssql.query_builder import gen_query_builder
 from threading import RLock
 from threading import Thread
+from tuple import Tuple
 from tweepy import StreamListener
 from tweepy import Stream
 
@@ -50,7 +51,7 @@ class QueryRunner(StreamListener):
     """ StreamListener methods """
     def on_status(self, status):
         self.status_lock.acquire()
-        self.statuses.append(status)
+        self.statuses.append(Tuple(status, None))
         if len(self.statuses) > self.batch_size:
             self.flush_statuses()
         self.status_lock.release()
