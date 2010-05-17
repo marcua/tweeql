@@ -7,13 +7,13 @@ class ReturnType():
     STRING = "STRING"
 
 class FieldDescriptor():
-    AGGREGATE_KEY = "aggregate_function"
+    AGGREGATE_KEY = "aggregate_factory"
     FUNCTION_KEY = "function"
     def __init__(self, alias, underlying_fields, field_type, **kwargs):
         self.alias = alias
         self.underlying_fields = underlying_fields
         self.field_type = field_type
         if self.field_type == FieldType.AGGREGATE:
-            self.aggregate_function = kwargs[FieldDescriptor.AGGREGATE_KEY]
+            self.aggregate_factory = kwargs[FieldDescriptor.AGGREGATE_KEY]
         elif self.field_type == FieldType.FUNCTION:
             self.function = kwargs[FieldDescriptor.FUNCTION_KEY]

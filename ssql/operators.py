@@ -1,3 +1,6 @@
+from aggregation import Aggregator
+from field_descriptor import FieldDescriptor
+
 class StatusSource(object):
     TWITTER_FILTER = 1
     TWITTER_SAMPLE = 2
@@ -18,8 +21,27 @@ class QueryOperator(object):
             Returns a tuple with lists: (follow_ids, track_words)
         """
         raise  NotImplementedError()
+    def assign_descriptor(self, tuple_descriptor):
+        raise NotImplementedError()
     def can_query_stream(self):
         return False
+
+class AllowAll(QueryOperator):
+    """
+        Allows all updates to pass this filter
+    """
+    def __init__(self):
+        QueryOperator.__init__(self)
+    def filter(self, updates, return_passes, return_fails):
+        passes = updates
+        fails = []
+        if not return_passes:
+            passes = None
+        if not return_fails:
+            fails = None
+        return (passes, fails)
+    def assign_descriptor(self, tuple_descriptor):
+        self.tuple_descriptor = tuple_descriptor
 
 class And(QueryOperator):
     """
@@ -52,6 +74,10 @@ class And(QueryOperator):
             if child.can_query_stream():
                 return True
         return False
+    def assign_descriptor(self, tuple_descriptor):
+        self.tuple_descriptor = tuple_descriptor
+        for child in self.children:
+            child.assign_descriptor(tuple_descriptor)
 
 class Or(QueryOperator):
     """
@@ -88,6 +114,10 @@ class Or(QueryOperator):
             if not child.can_query_stream():
                 return False
         return True
+    def assign_descriptor(self, tuple_descriptor):
+        self.tuple_descriptor = tuple_descriptor
+        for child in self.children:
+            child.assign_descriptor(tuple_descriptor)
 
 class Not(QueryOperator):
     """
@@ -103,6 +133,9 @@ class Not(QueryOperator):
         return child.filter_params()
     def can_query_stream(self):
         return child.can_query_stream()
+    def assign_descriptor(self, tuple_descriptor):
+        self.tuple_descriptor = tuple_descriptor
+        self.child.assign_descriptor(tuple_descriptor)
 
 class Follow(QueryOperator):
     """
@@ -125,10 +158,12 @@ class Follow(QueryOperator):
         return (self.ids, None)
     def can_query_stream(self):
         return True 
+    def assign_descriptor(self, tuple_descriptor):
+        self.tuple_descriptor = tuple_descriptor
 
 class Contains(QueryOperator):
     """
-        Passes updates which contain the desired term
+        Passes updates which contain the desired term.  Matching is case-insensitive.
     """
     def __init__(self, term):
         QueryOperator.__init__(self)
@@ -147,6 +182,8 @@ class Contains(QueryOperator):
         return (None, [self.term])
     def can_query_stream(self):
         return True
+    def assign_descriptor(self, tuple_descriptor):
+        self.tuple_descriptor = tuple_descriptor
 
 class Location(QueryOperator):
     """
@@ -167,3 +204,40 @@ class Location(QueryOperator):
             elif return_fails:
                 fails.append(update)
         return (passes, fails)
+    def assign_descriptor(self, tuple_descriptor):
+        self.tuple_descriptor = tuple_descriptor
+
+class GroupBy(QueryOperator):
+    """
+        Groups results from child by some set of fields, and runs the aggregate 
+        function(s) over them, emitting results and resetting buckets every
+        window seconds.
+    """
+    def __init__(self, child, groupby, aggregates, window):
+        QueryOperator.__init__(self)
+        self.child = child
+        self.can_query_stream_cache = self.can_query_stream_impl()
+        self.groupby = groupby
+        self.aggregates = aggregates
+        self.window = window
+        self.aggregator = Aggregator(self.aggregates, self.groupby)
+    def filter(self, updates, return_passes, return_fails):
+        # TODO does return_passes, return_fails matter here?
+        if return_passes:
+            (passes, fails) = self.child.filter(updates, return_passes, return_fails)
+            new_emissions = []
+            for aggregate in aggregates:
+                new_emissions.extend(aggregate.update(passes))
+            return (new_emissions, None)
+        else:
+            return (None, None)
+    def filter_params(self):
+        return child.filter_params()
+    def can_query_stream(self):
+        return self.can_query_stream_cache
+    def can_query_stream_impl(self):
+        return child.can_query_stream()
+    def assign_descriptor(self, tuple_descriptor):
+        self.tuple_descriptor = tuple_descriptor
+        self.child.assign_descriptor(self.groupby)
+
