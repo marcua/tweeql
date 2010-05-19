@@ -14,7 +14,7 @@ def gen_parser():
 
     ident          = Word( alphas, alphanums + "_$" ).setName("identifier")
     columnName     = delimitedList( ident, ".", combine=True ).setParseAction(upcaseTokens)
-    columnFunction = Word(alphas, alphanums) + "(" + delimitedList(columnName) + ")"
+    columnFunction = Group( Word(alphas, alphanums) + "(" + delimitedList(columnName) + ")" )
     columnExpression = columnFunction | columnName
     columnExpressionList = Group( delimitedList( columnExpression ) )
     tableName      = delimitedList( ident, ".", combine=True ).setParseAction(upcaseTokens)
@@ -44,8 +44,8 @@ def gen_parser():
     whereExpression << whereCondition + ZeroOrMore( ( and_ | or_ ) + whereExpression ) 
 
     # define the grammar
-    selectStmt      << ( selectToken + 
-            ( columnExpressionList ).setResultsName( "select" ) + 
+    selectStmt      << (  
+            Group ( selectToken + columnExpressionList ).setResultsName( "select" ) + 
             fromToken + 
             tableNameList.setResultsName( "sources" ) + 
             Optional( Group( CaselessLiteral("where") + whereExpression ), "" ).setResultsName("where") +

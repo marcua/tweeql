@@ -6,19 +6,15 @@ class Aggregator():
     def update(self, updates):
         for update in updates:
             bucket = update.generate_from_descriptor(groupby)
-            
-            get agg field desc
-            create aggregate tuples
-            update tuples
-            if update not in self.buckets:
+            if bucket not in self.buckets:
                 aggs = []
                 for aggregate in self.aggregates:
                     factory = aggregate.aggregate_factory
                     underlying = aggregate.underlying_fields
                     aggs.append(factory.create(underlying_fields))
-                self.buckets[update] = aggs
-            for aggregate in self.buckets[update]:
-                aggregate.update(tuple)
+                self.buckets[bucket] = aggs
+            for aggregate in self.buckets[bucket]:
+                aggregate.update(update)
             # TODO: window?
 
 class Aggregate():
@@ -31,7 +27,6 @@ class Aggregate():
         raise NotImplementedError()
     def reset(self):
         raise NotImplementedError()
-
 
 class Avg(Aggregate):
     @classmethod
