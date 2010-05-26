@@ -8,6 +8,7 @@ class QueryTokens:
     FROM = "FROM"
     WHERE = "WHERE"
     GROUPBY = "GROUP BY"
+    WINDOW = "WINDOW"
     TWITTER = "TWITTER"
     TWITTER_SAMPLE = "TWITTER_SAMPLE"
     LPAREN = "("
@@ -25,5 +26,5 @@ class QueryTokens:
     EQUALS = "="
     EXCLAIM_EQUALS = "!="
     NULL = "NULL"
-    TEXT = "text" # TODO: this is a field name.  should it be in QueryTokens?
+    EMPTY_STRING = ""
     WHERE_CONDITION = "$$$WHERE_CONDITION$$$"

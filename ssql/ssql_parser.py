@@ -3,7 +3,7 @@
 #
 from pyparsing import Literal, CaselessLiteral, Word, upcaseTokens, delimitedList, Optional, \
     Combine, Group, alphas, nums, alphanums, ParseException, Forward, oneOf, quotedString, \
-    ZeroOrMore, restOfLine, Keyword, removeQuotes
+    ZeroOrMore, restOfLine, Keyword, removeQuotes, downcaseTokens
 from ssql.query import QueryTokens
 
 def gen_parser():
@@ -12,6 +12,7 @@ def gen_parser():
     selectToken = Keyword(QueryTokens.SELECT, caseless=True)
     fromToken   = Keyword(QueryTokens.FROM, caseless=True)
     groupByToken   = Keyword(QueryTokens.GROUPBY, caseless=True)
+    windowToken   = Keyword(QueryTokens.WINDOW, caseless=True)
     asToken = Keyword(QueryTokens.AS, caseless=True).setParseAction(upcaseTokens)
 
     ident          = Word( alphas, alphanums + "_$" ).setName("identifier")
@@ -22,7 +23,8 @@ def gen_parser():
     columnExpressionList = Group( delimitedList( columnExpression ) )
     tableName      = delimitedList( ident, ".", combine=True ).setParseAction(upcaseTokens)
     tableNameList  = Group( delimitedList( tableName ) )
-
+    timeExpression = Word( nums ) + oneOf("seconds minutes hours days", caseless=True).setParseAction(downcaseTokens)
+    
     whereExpression = Forward()
     and_ = Keyword(QueryTokens.AND, caseless=True).setParseAction(upcaseTokens)
     or_ = Keyword(QueryTokens.OR, caseless=True).setParseAction(upcaseTokens)
@@ -52,7 +54,9 @@ def gen_parser():
             fromToken + 
             tableNameList.setResultsName( "sources" ) + 
             Optional( Group( CaselessLiteral(QueryTokens.WHERE) + whereExpression ), "" ).setResultsName("where") +
-            Optional (Group( groupByToken + columnExpressionList ), "").setResultsName("groupby") )
+            Optional ( groupByToken + columnExpressionList, "").setResultsName("groupby") +
+            Optional ( windowToken + timeExpression, "").setResultsName("window")
+            )
 
     parser = selectStmt
 

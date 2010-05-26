@@ -1,4 +1,5 @@
 from getpass import getpass
+from ssql.exceptions import QueryException
 from ssql.operators import StatusSource
 from ssql.query_builder import gen_query_builder
 from ssql.tuple_descriptor import Tuple
@@ -27,8 +28,11 @@ class QueryRunner(StreamListener):
     def run_built_query(self, query_built):
         self.query = query_built
         if self.query.source == StatusSource.TWITTER_FILTER:
-            (follow_ids, track_words) = self.query.query_tree.filter_params()
-            self.stream.filter(follow_ids, track_words, True)
+            try:
+                (follow_ids, track_words) = self.query.query_tree.filter_params()
+                self.stream.filter(follow_ids, track_words, True)
+            except NotImplementedError:
+                raise QueryException("You haven't specified any filters that can query Twitter.  Perhaps you want to query TWITTER_SAMPLE?")
         elif self.query.source == StatusSource.TWITTER_SAMPLE:
             self.stream.sample(None, True)
     def run_query(self, query_str):

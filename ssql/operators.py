@@ -1,6 +1,7 @@
 from aggregation import Aggregator
 from field_descriptor import FieldDescriptor
 from query import QueryTokens
+from twitter_fields import TwitterFields
 
 class StatusSource(object):
     TWITTER_FILTER = 1
@@ -189,7 +190,7 @@ class Contains(QueryOperator):
     def filter_params(self):
         return (None, [self.term])
     def can_query_stream(self):
-        if self.alias == QueryTokens.TEXT:
+        if self.alias == TwitterFields.TEXT:
             return True
         else:
             return False
@@ -220,7 +221,7 @@ class Equals(QueryOperator):
     def filter_params(self):
         return (None, [self.term])
     def can_query_stream(self):
-        if self.alias == QueryTokens.TEXT:
+        if self.alias == TwitterFields.TEXT:
             return True
         else:
             return False
@@ -263,26 +264,26 @@ class GroupBy(QueryOperator):
         self.groupby = groupby
         self.aggregates = aggregates
         self.window = window
-        self.aggregator = Aggregator(self.aggregates, self.groupby)
+        self.aggregator = Aggregator(self.aggregates, self.groupby, self.window)
     def filter(self, updates, return_passes, return_fails):
         if return_passes:
             (passes, fails) = self.child.filter(updates, return_passes, return_fails)
             new_emissions = []
-            for aggregate in aggregates:
-                new_emissions.extend(aggregate.update(passes))
+            new_emissions.extend(self.aggregator.update(passes))
             return (new_emissions, None)
         else:
             return (None, None)
     def filter_params(self):
-        return child.filter_params()
+        return self.child.filter_params()
     def can_query_stream(self):
         return self.can_query_stream_cache
     def can_query_stream_impl(self):
-        return child.can_query_stream()
+        return self.child.can_query_stream()
     def assign_descriptor(self, tuple_descriptor):
         self.tuple_descriptor = tuple_descriptor
         self.aggregator.tuple_descriptor = tuple_descriptor
         with_aggregates = self.groupby.duplicate()
-        for aggregate in aggregates:
+        for aggregate in self.aggregates:
             with_aggregates.add_descriptor(aggregate)
+        with_aggregates.add_descriptor(TwitterFields.created_field)
         self.child.assign_descriptor(with_aggregates)

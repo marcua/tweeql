@@ -30,7 +30,7 @@ class StreamListener(object):
         Override this method if you wish to manually handle
         the stream data. Return False to stop stream and close connection.
         """
-
+        
         if 'in_reply_to_status_id' in data:
             status = Status.parse(self.api, json.loads(data))
             if self.on_status(status) is False:

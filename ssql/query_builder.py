@@ -46,8 +46,10 @@ class QueryBuilder:
         select = parsed.select.asList()[1:][0]
         where_clause = parsed.where.asList()
         groupby = parsed.groupby.asList()
+        window = parsed.window.asList()
+        window = None if window == [''] else window[1:]
         (tree, where_fields) = self.__parse_where(where_clause)
-        tree = self.__add_select_and_aggregate(select, groupby, where_fields, tree)
+        tree = self.__add_select_and_aggregate(select, groupby, where_fields, window, tree)
         return tree
     def __parse_where(self, where_clause):
         tree = None
@@ -121,7 +123,7 @@ class QueryBuilder:
             return ands[0]
         else:
             return operators.And(ands)
-    def __add_select_and_aggregate(self, select, groupby, where, tree):
+    def __add_select_and_aggregate(self, select, groupby, where, window, tree):
         """
             select, groupby, and where are a list of unparsed fields
             in those respective clauses
@@ -129,7 +131,10 @@ class QueryBuilder:
         tuple_descriptor = TupleDescriptor()
         fields_to_verify = []
         all_fields = chain(select, where)
-        all_fields = all_fields if groupby == [''] else chain(all_fields, groupby)
+        if groupby != ['']:
+            groupby = groupby[1:][0]
+            all_fields = chain(all_fields, groupby)
+        self.__remove_all(groupby, QueryTokens.EMPTY_STRING)     
         for field in all_fields:
             (field_descriptors, verify) = self.__parse_field(field, self.twitter_td, True, False)
             fields_to_verify.extend(verify)
@@ -154,15 +159,19 @@ class QueryBuilder:
             (field_descriptors, verify) = self.__parse_field(field, tuple_descriptor, True, False)
             select_descriptor.add_descriptor_list(field_descriptors)
         if len(aggregates) > 0:
-            for field in group:
+            if window == None:
+                raise QueryException("Aggregate expression provided with no WINDOW parameter")
+            for field in groupby:
                 (field_descriptors, verify) = self.__parse_field(field, tuple_descriptor, True, False)
-                group_decriptor.add_descriptor_list(field_descriptors)
+                group_descriptor.add_descriptor_list(field_descriptors)
             for alias in select_descriptor.aliases:
-                select_field = select_descriptor.get(alias)
-                group_field = group_descriptor.get(alias)
-                if group_field == None and select_field.visible:
-                    raise QueryError("'%s' appears in the SELECT but is is neither an aggregate nor a GROUP BY field")
-            tree = operators.GroupBy(tree, groupby, aggregates, window)
+                select_field = select_descriptor.get_descriptor(alias)
+                group_field = group_descriptor.get_descriptor(alias)
+                if group_field == None and \
+                   select_field.field_type != FieldType.AGGREGATE and \
+                   select_field.visible:
+                    raise QueryException("'%s' appears in the SELECT but is is neither an aggregate nor a GROUP BY field" % (alias))
+            tree = operators.GroupBy(tree, group_descriptor, aggregates, window)
         tree.assign_descriptor(select_descriptor)
         return tree
     def __parse_field(self, field, tuple_descriptor, alias_on_complex_types, make_visible):

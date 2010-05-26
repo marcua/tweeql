@@ -1,3 +1,40 @@
+SELECT text FROM Twitter WHERE text CONTAINS 'Wind' and text CONTAINS '°F';
+SELECT text FROM Twitter WHERE text CONTAINS 'Wind' AND (text contains '°F' OR text CONTAINS '°C');
+SELECT text, temperatureF(text) as temperature FROM Twitter WHERE text CONTAINS 'Wind' AND (text contains '°F' OR text CONTAINS '°C');
+SELECT temperatureF(text) as temperature, location FROM Twitter WHERE text CONTAINS 'Wind' AND (text contains '°F' OR text CONTAINS '°C');
+select location from twitter_sample where location = "New York" 
+select location from twitter_sample where location != "New York"
+SHOULD FAIL BUT DOESN'T: select location from twitter_sample where location == "New York" 
+-----
+SELECT temperatureF(text) as temperature, location FROM Twitter WHERE text CONTAINS 'Wind' AND temperatureF(text) != 'NULL';
+
+test NULL---should return only filled temperatures
+SELECT text, temperatureF(text) as temperature, location FROM Twitter WHERE text CONTAINS 'Wind' AND temperature != 'NULL';
+
+test NULL---should return only null temperatures
+SELECT text, temperatureF(text) as temperature, location FROM Twitter WHERE text CONTAINS 'Wind' AND temperature = 'NULL'
+
+test multiple AS---should FAIL:
+SELECT text AS moo, location AS moo FROM Twitter WHERE text CONTAINS 'and';
+
+test different AS
+SELECT text AS moo, text AS moo2 FROM Twitter WHERE text CONTAINS 'and';
+
+test group by
+SELECT location, COUNT(text) AS tweets FROM TWITTER_SAMPLE GROUP BY location WINDOW 10 seconds;
+
+
+SELECT AVG(Temperature(status)) AS temp, location FROM twitter where status contains 'degF' GROUP BY location WINDOW 300s;
+SELECT Temperature(status) AS temp, Radius(location, 100) as location FROM twitter where status contains 'degF';
+
+
+
+
+
+
+
+
+
 ssql> SELECT temperatureF(text) as temperature, location FROM Twitter WHERE text CONTAINS 'Wind' 
 
 AND 
