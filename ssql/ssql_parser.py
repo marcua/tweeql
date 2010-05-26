@@ -4,29 +4,32 @@
 from pyparsing import Literal, CaselessLiteral, Word, upcaseTokens, delimitedList, Optional, \
     Combine, Group, alphas, nums, alphanums, ParseException, Forward, oneOf, quotedString, \
     ZeroOrMore, restOfLine, Keyword, removeQuotes
+from ssql.query import QueryTokens
 
 def gen_parser():
     # define SQL tokens
     selectStmt = Forward()
-    selectToken = Keyword("select", caseless=True)
-    fromToken   = Keyword("from", caseless=True)
-    groupByToken   = Keyword("group by", caseless=True)
+    selectToken = Keyword(QueryTokens.SELECT, caseless=True)
+    fromToken   = Keyword(QueryTokens.FROM, caseless=True)
+    groupByToken   = Keyword(QueryTokens.GROUPBY, caseless=True)
+    asToken = Keyword(QueryTokens.AS, caseless=True).setParseAction(upcaseTokens)
 
     ident          = Word( alphas, alphanums + "_$" ).setName("identifier")
-    columnName     = delimitedList( ident, ".", combine=True ).setParseAction(upcaseTokens)
-    columnFunction = Group( Word(alphas, alphanums) + "(" + delimitedList(columnName) + ")" )
-    columnExpression = columnFunction | columnName
+    columnName     = delimitedList( ident, ".", combine=True )
+    columnExpression = Forward()
+    columnFunction = Word(alphas, alphanums) + "(" + delimitedList(columnExpression) + ")" 
+    columnExpression << Group ( (columnFunction | columnName) + Optional( asToken + columnName ) )
     columnExpressionList = Group( delimitedList( columnExpression ) )
     tableName      = delimitedList( ident, ".", combine=True ).setParseAction(upcaseTokens)
     tableNameList  = Group( delimitedList( tableName ) )
 
     whereExpression = Forward()
-    and_ = Keyword("and", caseless=True).setParseAction(upcaseTokens)
-    or_ = Keyword("or", caseless=True).setParseAction(upcaseTokens)
-    in_ = Keyword("in", caseless=True).setParseAction(upcaseTokens)
+    and_ = Keyword(QueryTokens.AND, caseless=True).setParseAction(upcaseTokens)
+    or_ = Keyword(QueryTokens.OR, caseless=True).setParseAction(upcaseTokens)
+    in_ = Keyword(QueryTokens.IN, caseless=True).setParseAction(upcaseTokens)
 
     E = CaselessLiteral("E")
-    binop = oneOf("= != < > >= <= eq ne lt le gt ge contains", caseless=True).setParseAction(upcaseTokens)
+    binop = oneOf("= != < > >= <= eq ne lt le gt ge %s" % (QueryTokens.CONTAINS), caseless=True).setParseAction(upcaseTokens)
     arithSign = Word("+-",exact=1)
     realNum = Combine( Optional(arithSign) + ( Word( nums ) + "." + Optional( Word(nums) )  |
                 ( "." + Word(nums) ) ) + 
@@ -36,9 +39,9 @@ def gen_parser():
 
     columnRval = realNum | intNum | columnExpression | quotedString.setParseAction(removeQuotes)
     whereCondition = Group(
-            ( columnExpression + binop + columnRval ) |
-            ( columnExpression + in_ + "(" + delimitedList( columnRval ) + ")" ) |
-            ( columnExpression + in_ + "(" + selectStmt + ")" ) |
+            ( columnExpression + binop + columnRval ).setParseAction(label(QueryTokens.WHERE_CONDITION)) |
+            ( columnExpression + in_ + "(" + delimitedList( columnRval ) + ")" ).setParseAction(label(QueryTokens.WHERE_CONDITION)) |
+            ( columnExpression + in_ + "(" + selectStmt + ")" ).setParseAction(label(QueryTokens.WHERE_CONDITION)) |
             ( "(" + whereExpression + ")" )
             )
     whereExpression << whereCondition + ZeroOrMore( ( and_ | or_ ) + whereExpression ) 
@@ -48,7 +51,7 @@ def gen_parser():
             Group ( selectToken + columnExpressionList ).setResultsName( "select" ) + 
             fromToken + 
             tableNameList.setResultsName( "sources" ) + 
-            Optional( Group( CaselessLiteral("where") + whereExpression ), "" ).setResultsName("where") +
+            Optional( Group( CaselessLiteral(QueryTokens.WHERE) + whereExpression ), "" ).setResultsName("where") +
             Optional (Group( groupByToken + columnExpressionList ), "").setResultsName("groupby") )
 
     parser = selectStmt
@@ -72,6 +75,16 @@ def test( str ):
         print " "*err.loc + "^\n" + err.msg
         print err
     print
+
+def label(l):
+    """
+        Returns a parseaction which prepends the tokens with the label l
+    """
+    def action(string, loc, tokens):
+        newlist = [l]
+        newlist.extend(tokens)
+        return newlist
+    return action
 
 def runtests():
     test( "SELECT * from XYZZY, ABC" )

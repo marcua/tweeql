@@ -1,27 +1,34 @@
+from itertools import chain
 from ssql import operators
-from ssql.ssql_parser import gen_parser
+from ssql.aggregation import get_aggregate_factory
 from ssql.operators import StatusSource
-from ssql.query import Query
 from ssql.exceptions import QueryException
+from ssql.field_descriptor import FieldDescriptor
+from ssql.field_descriptor import FieldType
+from ssql.function_registry import FunctionRegistry
+from ssql.query import Query
+from ssql.query import QueryTokens
+from ssql.ssql_parser import gen_parser
+from ssql.tuple_descriptor import TupleDescriptor
 from ssql.twitter_fields import twitter_tuple_descriptor
-
-class QueryTokens:
-    TWITTER = "TWITTER"
-    TWITTER_SAMPLE = "TWITTER_SAMPLE"
-    LPAREN = "("
-    RPAREN = ")"
-    AND = "AND"
-    OR = "OR"
-    CONTAINS = "CONTAINS"
 
 def gen_query_builder():
     return QueryBuilder()
 
 class QueryBuilder:
+    """
+        Generates a query from a declarative specification in a SQL-like syntax.
+        This class is not thread-safe
+    """
     def __init__(self):
         self.parser = gen_parser()
+        self.function_registry = FunctionRegistry()
         self.unnamed_operator_counter = 0
+        self.twitter_td = twitter_tuple_descriptor()
     def build(self, query_str):
+        """
+            Takes a Unicode string query_str, and outputs a query tree
+        """
         parsed = self.parser.parseString(query_str)
         source = self.__get_source(parsed)
         tree = self.__get_tree(parsed)
@@ -36,26 +43,29 @@ class QueryBuilder:
         else:
             raise QueryException('Unknown query source: %s' % (source))
     def __get_tree(self, parsed):
-        select = parsed.select.asList()[1:]
+        select = parsed.select.asList()[1:][0]
         where_clause = parsed.where.asList()
         groupby = parsed.groupby.asList()
-        tree = self.__parse_where(where_clause)
-        tree = self.__add_aggregate(select, groupby, tree)
-        #self.__assign_descriptors(parsed, tree)
+        (tree, where_fields) = self.__parse_where(where_clause)
+        tree = self.__add_select_and_aggregate(select, groupby, where_fields, tree)
         return tree
     def __parse_where(self, where_clause):
         tree = None
+        where_fields = []
         if where_clause == ['']: # no where predicates
             tree = operators.AllowAll() 
         else:
-            tree = self.__parse_clauses(where_clause[0][1:])
-        return tree
-    def __parse_clauses(self, clauses):
+            tree = self.__parse_clauses(where_clause[0][1:], where_fields)
+        return (tree, where_fields)
+    def __parse_clauses(self, clauses, where_fields):
+        """
+            Parses the WHERE clauses in the query.  Adds any fields it discovers to where_fields
+        """
         self.__clean_list(clauses)
         if type(clauses) != list: # This is a token, not an expression 
             return clauses
-        elif type(clauses[0]) != list: # This is an operator expression
-            return self.__parse_operator(clauses)
+        elif clauses[0] == QueryTokens.WHERE_CONDITION: # This is an operator expression
+            return self.__parse_operator(clauses[1:], where_fields)
         else: # This is a combination of expressions w/ AND/OR
             # ands take precedent over ors, so 
             # A and B or C and D -> (A and B) or (C and D)
@@ -63,7 +73,7 @@ class QueryBuilder:
             ors = []
             i = 0
             while i < len(clauses):
-                ands.append(self.__parse_clauses(clauses[i]))
+                ands.append(self.__parse_clauses(clauses[i], where_fields))
                 if i+1 == len(clauses):
                     ors.append(self.__and_or_single(ands))
                 else:
@@ -79,9 +89,26 @@ class QueryBuilder:
                 return ors[0]
             else:
                 return operators.Or(ors)
-    def __parse_operator(self, clause):
+    def __parse_operator(self, clause, where_fields):
         if len(clause) == 3 and clause[1] == QueryTokens.CONTAINS:
-            return operators.Contains(clause[2])
+            alias = self.__where_field(clause[0], where_fields)
+            return operators.Contains(alias, clause[2])
+        elif len(clause) == 3 and clause[1] == QueryTokens.EQUALS:
+            alias = self.__where_field(clause[0], where_fields)
+            return operators.Equals(alias, clause[2])
+        elif len(clause) == 3 and clause[1] == QueryTokens.EXCLAIM_EQUALS:
+            alias = self.__where_field(clause[0], where_fields)
+            return operators.Not(operators.Equals(alias, clause[2]))
+    def __where_field(self, field, where_fields):
+        (field_descriptors, verify) = self.__parse_field(field, self.twitter_td, False, False)
+        alias = field_descriptors[0].alias
+        # name the field whatever alias __parse_field gave it so it can be
+        # passed to __parse_field in the future and have a consistent name
+        if not ((len(field) >= 3) and (field[-2] == QueryTokens.AS)):
+            field.append(QueryTokens.AS)
+            field.append(alias)
+        where_fields.append(field)
+        return alias
     def __clean_list(self, list):
         self.__remove_all(list, QueryTokens.LPAREN)
         self.__remove_all(list, QueryTokens.RPAREN)
@@ -94,15 +121,19 @@ class QueryBuilder:
             return ands[0]
         else:
             return operators.And(ands)
-    def __add_aggregate(self, select, groupby, tree):
-        # TODO: verify that nothing in FROM is outside of GROUP BY/Aggregate
-        twitter_td = twitter_tuple_descriptor()
+    def __add_select_and_aggregate(self, select, groupby, where, tree):
+        """
+            select, groupby, and where are a list of unparsed fields
+            in those respective clauses
+        """
         tuple_descriptor = TupleDescriptor()
         fields_to_verify = []
-        for field in chain(select, groupby):
-            (field_descriptor, verify) = self.__parse_field(field, twitter_td)
+        all_fields = chain(select, where)
+        all_fields = all_fields if groupby == [''] else chain(all_fields, groupby)
+        for field in all_fields:
+            (field_descriptors, verify) = self.__parse_field(field, self.twitter_td, True, False)
             fields_to_verify.extend(verify)
-            tuple_descriptor.add_descriptor(field_descriptor)
+            tuple_descriptor.add_descriptor_list(field_descriptors)
         for field in fields_to_verify:
             self.__verify_and_fix_field(field, tuple_descriptor)
         
@@ -112,33 +143,50 @@ class QueryBuilder:
         # from it
         select_descriptor = TupleDescriptor()
         group_descriptor = TupleDescriptor()
-        for field in select:
-            (field_descriptor, verify) = self.__parse_field(field, tuple_descriptor)
-            select_decriptor.add_descriptor(field_descriptor)
-        for field in group:
-            (field_descriptor, verify) = self.__parse_field(field, tuple_descriptor)
-            group_decriptor.add_descriptor(field_descriptor)
-          
         aggregates = []
-        for alias in select_descriptor.aliases:
-            select_descriptor.get(
-        make sure all select is either an aggregate function or in the group by
-        assign tuple descriptors all the way down
-
-        if groupby == ['']:
-            return tree 
+        for field in select:
+            (field_descriptors, verify) = self.__parse_field(field, tuple_descriptor, True, True)
+            select_descriptor.add_descriptor_list(field_descriptors)
+            if field_descriptors[0].field_type == FieldType.AGGREGATE:
+                aggregates.append(field_descriptors[0])
+        # add WHERE clause fields as invisible attributes
+        for field in where:
+            (field_descriptors, verify) = self.__parse_field(field, tuple_descriptor, True, False)
+            select_descriptor.add_descriptor_list(field_descriptors)
+        if len(aggregates) > 0:
+            for field in group:
+                (field_descriptors, verify) = self.__parse_field(field, tuple_descriptor, True, False)
+                group_decriptor.add_descriptor_list(field_descriptors)
+            for alias in select_descriptor.aliases:
+                select_field = select_descriptor.get(alias)
+                group_field = group_descriptor.get(alias)
+                if group_field == None and select_field.visible:
+                    raise QueryError("'%s' appears in the SELECT but is is neither an aggregate nor a GROUP BY field")
+            tree = operators.GroupBy(tree, groupby, aggregates, window)
+        tree.assign_descriptor(select_descriptor)
         return tree
-    def __parse_field(self, field, tuple_descriptor, alias_on_complex_types)
+    def __parse_field(self, field, tuple_descriptor, alias_on_complex_types, make_visible):
+        """
+            Returns a tuple containing (field_descriptors, fieldnames_to_verify)
+
+            The first field in field_descriptors is the one requested to be parsed by this
+            function call.  If the field turns out to be an aggregate or a user-defined
+            function call, then field_descriptors will contain those parsed field descriptors
+            as well, with their visible flag set to False.  
+
+            fieldnames_to_verify is a list of field names that should be verified in order
+            to ensure that at some point their alias is defined in an AS clause.
+        """
         alias = None
-        type = None
-        underlying = None
+        field_type = None
+        underlying_fields = None
         aggregate_factory = None
         function = None
         fields_to_verify = []
-        field_backup = field
-
+        parsed_fds = []
+        field_backup = list(field)
         self.__clean_list(field)
-       
+        
         # parse aliases if they exist
         if (len(field) >= 3) and (field[-2] == QueryTokens.AS):
             alias = field[-1]
@@ -149,53 +197,66 @@ class QueryBuilder:
                 alias = field[0]
             field_descriptor = tuple_descriptor.get_descriptor(field[0])
             if field_descriptor == None: # underlying field not yet defined.  mark to check later
-                type = FieldType.UNDEFINED
-                underlying = [field[0]]
+                field_type = FieldType.UNDEFINED
+                underlying_fields = [field[0]]
                 # check alias and underlying once this process is done to
                 # find yet-undefined fields
                 fields_to_verify.append(field[0])
                 fields_to_verify.append(alias)
             else: # field found, copy information
-                type = field_descriptor.field_type
-                underlying = field_descriptor.underlying_field
+                field_type = field_descriptor.field_type
+                underlying_fields = field_descriptor.underlying_fields
                 aggregate_factory = field_descriptor.aggregate_factory
                 function = field_descriptor.function
         elif len(field) > 1: # function or aggregate  
             if alias == None:
                 if alias_on_complex_types:
-                    raise QueryException("Must specify alias (AS clause) for '%s'" % ("".join(field)))
+                    raise QueryException("Must specify alias (AS clause) for '%s'" % (repr(field)))
                 else:
                     self.unnamed_operator_counter += 1
                     alias = "operand%d" % (self.unnamed_operator_counter)
-            underlying_fields = field[1:]
-            fields_to_verify.extend(underlying_fields)
+            underlying_field_list = field[1:]
+            underlying_fields = []
+            for underlying in underlying_field_list:
+                (parsed_fd_list, parsed_verify) = self.__parse_field(underlying, tuple_descriptor, False, False)
+                for parsed_fd in parsed_fd_list:
+                    parsed_fd.visible = False
+                fields_to_verify.extend(parsed_verify)
+                parsed_fds.extend(parsed_fd_list)
+                underlying_fields.append(parsed_fd_list[0].alias)
             aggregate_factory = get_aggregate_factory(field[0])
             if aggregate_factory != None: # found an aggregate function
-                type = FieldType.AGGREGATE
+                field_type = FieldType.AGGREGATE
             else:
-                function = get_function(field[0])
+                function = self.function_registry.get_function(field[0])
                 if function != None:
-                    type = FieldType.FUNCTION
+                    field_type = FieldType.FUNCTION
                 else:
                     raise QueryException("'%s' is neither an aggregate or a registered function" % (field[0]))
         else:
-            raise QueryException("Empty field clause found: %s" % ("".join(field_backup))
-
+            raise QueryException("Empty field clause found: %s" % ("".join(field_backup)))
         fd = FieldDescriptor(alias, underlying_fields, field_type, aggregate_factory, function)
-        return (fd, fields_to_verify)
+        fd.visible = make_visible
+        parsed_fds.insert(0, fd)
+        return (parsed_fds, fields_to_verify)
     
     def __verify_and_fix_field(self, field, tuple_descriptor):
         field_descriptor = tuple_descriptor.get_descriptor(field)
+        error = False
         if field_descriptor == None:
-            raise QueryException("Field '%s' is neither a builtin field nor an alias" % (field))
+            error = True
         elif field_descriptor.field_type == FieldType.UNDEFINED:
-            referenced_field_descriptor = \
-                self.__verify_and_fix_field(field_descriptor.underlying_fields[0], tuple_descriptor)
-            field_descriptor.underlying_fields = referenced_field_descriptor.underlying_fields
-            field_descriptor.field_type = referenced_field_descriptor.field_type
-            field_descriptor.aggregate_factory = referenced_field_descriptor.aggregate_factory
-            field_descriptor.function = referenced_field_descriptor.function
-        return field_descriptor
-    def __assign_descriptors(self, parsed, tree):
-        # assign root the tupledescriptor
-        tree.assign_descriptor(parsed.select)  
+            if field == field_descriptor.underlying_fields[0]:
+                error = True
+            else:
+                referenced_field_descriptor = \
+                    self.__verify_and_fix_field(field_descriptor.underlying_fields[0],
+                                                tuple_descriptor)
+                field_descriptor.underlying_fields = referenced_field_descriptor.underlying_fields
+                field_descriptor.field_type = referenced_field_descriptor.field_type
+                field_descriptor.aggregate_factory = referenced_field_descriptor.aggregate_factory
+                field_descriptor.function = referenced_field_descriptor.function
+        if error:
+            raise QueryException("Field '%s' is neither a builtin field nor an alias" % (field))
+        else:
+            return field_descriptor

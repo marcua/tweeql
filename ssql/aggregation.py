@@ -1,7 +1,11 @@
+from ssql.query import QueryTokens 
+from ssql.exceptions import QueryException
+
 class Aggregator():
     def __init__(self, aggregates, groupby):
         self.aggregates = aggregates
         self.groupby = groupby
+        self.tuple_descriptor
         self.buckets = {}
     def update(self, updates):
         for update in updates:
@@ -21,19 +25,33 @@ class Aggregate():
     def __init__(self, underlying_fields):
         self.underlying_fields = underlying_fields
         self.reset()
-    def update(self, tuple):
+    def update(self, t):
         raise  NotImplementedError()
     def value(self):
         raise NotImplementedError()
     def reset(self):
         raise NotImplementedError()
 
+def get_aggregate_factory(agg_func):
+    if agg_func == QueryTokens.AVG:
+        return Avg.create
+    elif agg_func == QueryTokens.COUNT:
+        return Count.create
+    elif agg_func == QueryTokens.SUM:
+        return Sum.create
+    elif agg_func == QueryTokens.MIN:
+        return Min.create
+    elif agg_func == QueryTokens.MAX:
+        return Max.create
+    else:
+        return None
+
 class Avg(Aggregate):
     @classmethod
     def create(cls, underlying_fields):
         return Avg(underlying_fields)
-    def update(self, tuple):
-        self.sum += getattr(tuple, self.underlying_fields[0])
+    def update(self, t):
+        self.sum += getattr(t, self.underlying_fields[0])
         self.count += 1
     def value(self):
         return self.sum/self.count
@@ -45,7 +63,7 @@ class Count(Aggregate):
     @classmethod
     def create(cls, underlying_fields):
         return Count(underlying_fields)
-    def update(self, tuple):
+    def update(self, t):
         self.count += 1
     def value(self):
         return self.count
@@ -56,8 +74,8 @@ class Sum(Aggregate):
     @classmethod
     def create(cls, underlying_fields):
         return Sum(underlying_fields)
-    def update(self, tuple):
-        self.sum += getattr(tuple, self.underlying_fields[0])
+    def update(self, t):
+        self.sum += getattr(t, self.underlying_fields[0])
     def value(self):
         return self.sum
     def reset(self):
@@ -67,8 +85,8 @@ class Min(Aggregate):
     @classmethod
     def create(cls, underlying_fields):
         return Min(underlying_fields)
-    def update(self, tuple):
-        val = getattr(tuple, self.underlying_fields[0])
+    def update(self, t):
+        val = getattr(t, self.underlying_fields[0])
         if (self.min is None) or (val < self.min):
             self.min = val
     def value(self):
@@ -80,8 +98,8 @@ class Max(Aggregate):
     @classmethod
     def create(cls, underlying_fields):
         return Max(underlying_fields)
-    def update(self, tuple):
-        val = getattr(tuple, self.underlying_fields[0])
+    def update(self, t):
+        val = getattr(t, self.underlying_fields[0])
         if (self.max is None) or (val > self.max):
             self.max = val
     def value(self):

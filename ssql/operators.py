@@ -1,5 +1,6 @@
 from aggregation import Aggregator
 from field_descriptor import FieldDescriptor
+from query import QueryTokens
 
 class StatusSource(object):
     TWITTER_FILTER = 1
@@ -34,6 +35,8 @@ class AllowAll(QueryOperator):
         QueryOperator.__init__(self)
     def filter(self, updates, return_passes, return_fails):
         passes = updates
+        for update in passes:
+            update.set_tuple_descriptor(self.tuple_descriptor)
         fails = []
         if not return_passes:
             passes = None
@@ -104,9 +107,11 @@ class Or(QueryOperator):
         for child in self.children:
             if child.can_query_stream():
                 (follow_local, track_local) = child.filter_params()
-                follow_ids.extend(follow_local)
-                track_words.extend(track_local)
-        return (follow_ids, track_ids)
+                if follow_local != None:
+                    follow_ids.extend(follow_local)
+                if track_local != None:
+                    track_words.extend(track_local)
+        return (follow_ids, track_words)
     def can_query_stream(self):
         return self.can_query_stream_cache
     def can_query_stream_impl(self):
@@ -132,7 +137,7 @@ class Not(QueryOperator):
     def filter_params(self):
         return child.filter_params()
     def can_query_stream(self):
-        return child.can_query_stream()
+        return self.child.can_query_stream()
     def assign_descriptor(self, tuple_descriptor):
         self.tuple_descriptor = tuple_descriptor
         self.child.assign_descriptor(tuple_descriptor)
@@ -148,6 +153,7 @@ class Follow(QueryOperator):
         passes = [] if return_passes else None
         fails = [] if return_fails else None
         for update in updates:
+            update.set_tuple_descriptor(self.tuple_descriptor)
             if update.author in self.ids:
                 if return_passes:
                     passes.append(update.author)
@@ -165,14 +171,16 @@ class Contains(QueryOperator):
     """
         Passes updates which contain the desired term.  Matching is case-insensitive.
     """
-    def __init__(self, term):
+    def __init__(self, field_alias, term):
         QueryOperator.__init__(self)
+        self.alias = field_alias
         self.term = term.lower()
     def filter(self, updates, return_passes, return_fails):
         passes = [] if return_passes else None
         fails = [] if return_fails else None
         for update in updates:
-            if self.term in update.text.lower():
+            update.set_tuple_descriptor(self.tuple_descriptor)
+            if self.term in getattr(update, self.alias).lower():
                 if return_passes:
                     passes.append(update)
             elif return_fails:
@@ -181,7 +189,41 @@ class Contains(QueryOperator):
     def filter_params(self):
         return (None, [self.term])
     def can_query_stream(self):
-        return True
+        if self.alias == QueryTokens.TEXT:
+            return True
+        else:
+            return False
+    def assign_descriptor(self, tuple_descriptor):
+        self.tuple_descriptor = tuple_descriptor
+
+class Equals(QueryOperator):
+    """
+        Passes updates which equal the desired term.  Matching is case-sensitive.
+    """
+    def __init__(self, field_alias, term):
+        QueryOperator.__init__(self)
+        self.alias = field_alias
+        if term == QueryTokens.NULL:
+            term = None
+        self.term = term
+    def filter(self, updates, return_passes, return_fails):
+        passes = [] if return_passes else None
+        fails = [] if return_fails else None
+        for update in updates:
+            update.set_tuple_descriptor(self.tuple_descriptor)
+            if self.term == getattr(update, self.alias):
+                if return_passes:
+                    passes.append(update)
+            elif return_fails:
+                fails.append(update)
+        return (passes, fails)
+    def filter_params(self):
+        return (None, [self.term])
+    def can_query_stream(self):
+        if self.alias == QueryTokens.TEXT:
+            return True
+        else:
+            return False
     def assign_descriptor(self, tuple_descriptor):
         self.tuple_descriptor = tuple_descriptor
 
@@ -196,6 +238,7 @@ class Location(QueryOperator):
         passes = [] if return_passes else None
         fails = [] if return_fails else None
         for update in updates:
+            update.set_tuple_descriptor(self.tuple_descriptor)
             x = update.geo.x
             y = update.geo.y
             if x >= xmin and x <= xmax and y >= ymin and y <= ymax:
@@ -222,7 +265,6 @@ class GroupBy(QueryOperator):
         self.window = window
         self.aggregator = Aggregator(self.aggregates, self.groupby)
     def filter(self, updates, return_passes, return_fails):
-        # TODO does return_passes, return_fails matter here?
         if return_passes:
             (passes, fails) = self.child.filter(updates, return_passes, return_fails)
             new_emissions = []
@@ -239,5 +281,8 @@ class GroupBy(QueryOperator):
         return child.can_query_stream()
     def assign_descriptor(self, tuple_descriptor):
         self.tuple_descriptor = tuple_descriptor
-        self.child.assign_descriptor(self.groupby)
-
+        self.aggregator.tuple_descriptor = tuple_descriptor
+        with_aggregates = self.groupby.duplicate()
+        for aggregate in aggregates:
+            with_aggregates.add_descriptor(aggregate)
+        self.child.assign_descriptor(with_aggregates)

@@ -1,0 +1,1529 @@
+ssql> SELECT temperatureF(text) as temperature, location FROM Twitter WHERE text CONTAINS 'Wind' 
+
+AND 
+
+(text contains '°F' OR text CONTAINS '°C');
+
+63.32,Evesham, Worcs
+39.2,None
+55.4,Vechelde
+53.42,Geelong
+81.8,Zion, IL
+57.92,Taunton, Somerset. UK
+89.6,Massachusetts
+37.4,Auckland, New Zealand
+68.36,None
+86.7,Hersey, MI
+60.5,Thornton, CO
+56.66,Auckland,New Zealand
+80.6,None
+63.5,None
+69.4,Concord, NC
+50.18,Palmerston North
+67.1,Moschato, Hellas
+78.8,Stratham NH 03885 USA
+97.7,Mouton Cove, Abbeville, LA
+58.46,Driedorf Germany
+62.6,Aarau
+70.7,Saint-Egrève
+78.26,
+54.5,34°1′54″S, 150°49′1″E
+72.9,None
+45.68,Hobart, Australia
+47.84,Perth, Australia
+67.82,Chalkis, Evia
+71.6,Konstanz
+66.2,Basel
+65.3,None
+79.0,Coachella Valley, California
+62.6,Zürich
+62.96,Sint Hubert, The Netherlands
+62.6,Olten
+44.6,Bergen, Norway
+79.0,Anthem, AZ
+83.7,Casselberry, FL
+58.1,Dieren, Nederland
+75.7,Williamsburg, VA
+50.0,Canberra, Australia
+64.58,Duffel, Belgium
+65.48,Crondall, Surrey UK
+60.6,Angels Camp, CA, USA
+54.5,NZ
+54.68,iPhone: -37.878723,144.603256
+45.5,Hobart, Tasmania
+65.66,Ashington West Sussex
+32.0,Italy
+92.9,ankeny, iowa
+54.14,
+60.26,Brighstone, Isle of Wight
+77.2,Lorton, VA USA
+58.64,St. Peter Port, Guernsey
+54.14,Heist aan zee
+53.6,Platres, Cyprus
+60.26,Honsolgen
+61.52,SunnyBank Qld Australia
+33.8,Kristianstad, Sweden
+50.18,Derry, Ireland
+60.98,Uckfield
+37.4,Preveza - Greece
+56.48,Waterford
+61.88,San Antonio de Areco Argentina
+55.4,Folkestone
+76.2,Bemidji, MN, USA
+57.74,Seaford, UK
+53.42,Geelong
+81.9,Zion, IL
+33.8,None
+33.8,
+97.0,
+57.74,None
+None,Calgary, Alberta
+44.6,France
+62.6,Weymouth, UK
+90.5,
+73.7,Baltimore, Maryland
+52.7,Wellington South Africa
+54.68,Vechelde
+50.18,Palmerston North
+46.4,Oud-Beijerland
+93.56,Port McNicoll,Ontario,Canada
+42.8,None
+57.02,Chelmsford
+32.0,None
+53.06,
+64.76,None
+33.8,None
+50.18,Palmerston North
+58.3,Camas Washington USA
+57.0,Amsterdam, Netherlands
+54.68,34°1′54″S, 150°49′1″E
+90.1,Round Rock, Texas
+75.7,63957
+59.54,Auckland NZ
+59.9,Lower Rhine, Germany
+90.5,New Orleans, Louisiana
+87.1,Lake Mexia, TX 76667
+61.52,SunnyBank Qld Australia
+50.9,None
+55.58,
+50.9,
+42.8,None
+89.6,
+53.78,Keyingham, UK
+53.42,Ararat, VIC, Australia
+53.6,Dublin
+37.4,Megaland, Landgraaf 
+97.9,Mouton Cove, Abbeville, LA
+59.18,None
+69.8,Saint-Egrève
+53.42,Geelong
+58.28,Seaford, UK
+51.26,Elvington,York, England
+35.42,Suldal, Norway
+43.16,Western Isles, Scotland
+88.9,Massachusetts
+76.28,
+44.6,
+48.2,None
+64.22,None
+53.96,Melbourne, Victoria, Australia
+37.4,Sweden
+54.86,Paisley, Scotland
+46.4,Holwerd
+62.78,Exeter
+53.42,Geelong
+72.0,Brookhaven, NY
+81.0,Zion, IL
+55.04,Taunton, Somerset. UK
+33.8,59.39171,13.537266
+39.2,None
+87.1,Lake Mexia, TX 76667
+50.5,None
+66.56,None
+89.1,
+53.6,None
+35.6,
+77.5,None
+67.82,San Pedro, Murcia, Spain
+53.06,Filey, North Yorkshire, UK
+54.14,
+80.1,
+86.3,Milwaukee, Wisconsin
+82.4,Manila, Philippines
+49.28,Auckland, New Zealand
+37.4,Megaland, Landgraaf 
+74.7,Laguna Hills, CA
+46.4,Adlkofen
+70.4,None
+69.62,Saint-Egrève
+54.86,34°1′54″S, 150°49′1″E
+76.1,Woonsocket, Rhode Island
+84.0,
+53.06,Beemster
+59.18,Kaatsheuvel, The Netherlands
+57.38,Landrake, Cornwall.UK
+70.5,None
+88.2,Saint Petersburg, FL
+63.32,Bracknell, UK
+81.1,Anthem, AZ
+57.56,Dieren, Nederland
+52.16,Berwick, Victoria, Australia
+48.38,Glenrothes, Fife, UK
+63.68,Duffel, Belgium
+69.1,Fresno, California
+74.7,Baltimore, Maryland
+59.0,Brighstone, Isle of Wight
+32.0,Italy
+43.52,
+67.46,South Wonston, Hampshire
+46.4,None
+42.8,None
+63.68,None
+55.76,Waterford
+86.7,Broken Arrow, OK
+88.6,Muskegon, MI
+56.12,Kingsgrove
+42.8,None
+50.0,Palmerston North
+93.0,
+55.58,Dessau
+53.42,Geelong
+81.0,Zion, IL
+61.7,51.85 -2.20
+39.2,None
+87.3,Lake Mexia, TX 76667
+50.6,None
+64.94,Auckland, New Zealand
+62.4,Vienna, Austria
+57.0,Boise Idaho
+54.14,Sheffield, United Kingdom
+50.9,None
+57.02,Kettering Northamptonshire
+35.6,
+55.04,Wentworthville, NSW  Australia
+98.2,Mouton Cove, Abbeville, LA
+46.4,Megaland, Landgraaf 
+69.44,Saint-Egrève
+53.42,Geelong
+35.24,Suldal, Norway
+86.9,
+43.52,
+46.4,Zoetermeer,Netherlands
+56.3,Chelmsford
+73.7,Pittsburgh, PA
+35.6,None
+42.8,None
+41.0,None
+63.14,None
+54.32,Paisley, Scotland
+50.18,Palmerston North
+78.8,Barberton, Oh. (Portage Lakes
+42.9,
+58.1,Driedorf Germany
+91.4,Round Rock, Texas
+54.86,34°1′54″S, 150°49′1″E
+69.8,63957
+57.38,
+62.24,Auckland NZ
+52.7,Heemskerk
+35.6,None
+87.2,New Orleans, Louisiana
+87.7,Lake Mexia, TX 76667
+83.8,Nashua, NH
+91.6,
+53.6,Ararat, VIC, Australia
+35.6,
+33.8,Preveza - Greece
+46.4,Megaland, Landgraaf 
+97.7,Mouton Cove, Abbeville, LA
+46.4,Megaland, Landgraaf 
+41.0,Sliedrecht Netherlands
+59.0,Seaford, UK
+49.64,Freuchie, Cupar, Fife
+86.2,
+37.4,Santa Lucía - Buenos Aires
+35.24,Suldal, Norway
+56.48,Landrake, Cornwall.UK
+87.7,Lake Mexia, TX 76667
+62.78,NZ
+62.78,None
+77.0,Bemidji, MN, USA
+63.32,Bournemouth
+86.1,Broken Arrow, OK
+55.22,Waterford
+33.8,None
+50.18,Palmerston North
+60.8,
+53.6,Geelong
+54.68,Taunton, Somerset. UK
+37.4,Auckland, New Zealand
+65.3,None
+88.5,
+53.24,Ararat, VIC, Australia
+90.7,Hurdland, Missouri
+63.32,Auckland, New Zealand
+57.92,None
+59.9,London UK
+59.36,Auckland,New Zealand
+69.1,Concord, NC
+86.5,Hersey, MI
+71.6,Duisburg
+63.5,None
+80.4,
+50.36,Palmerston North
+46.4,Burgsvik, Gotland, Sweden
+47.12,Auckland, New Zealand
+35.6,Megaland, Landgraaf 
+35.6,Parkstad (NL / Lim)
+97.5,Mouton Cove, Abbeville, LA
+65.12,Kressbronn
+65.8,Denver, CO, USA
+50.54,Belfast Northern Ireland
+68.9,Saint-Egrève
+64.4,Aarau
+78.44,
+53.96,Sherburn Yorkshire
+58.1,Somerset, UK
+55.04,34°1′54″S, 150°49′1″E
+57.2,Muenster
+58.1,Bovenkarspel, Nederland
+64.4,Duesseldorf
+70.2,None
+93.0,None
+64.4,Dortmund
+62.6,Chur
+68.0,Konstanz
+61.16,
+59.0,Leipzig
+55.4,Dresden
+64.4,Basel
+51.08,Wangerooge
+64.4,Duisburg
+50.36,Canberra, Australia
+62.6,Bern
+45.86,Hobart, Australia
+58.46,Newcastle, Australia
+66.2,Luzern
+46.58,Perth, Australia
+57.38,Sydney, Australia
+60.8,St. Gallen
+63.32,Gold Coast, Australia
+69.1,63957
+83.84,Pakchong,Nakhon Ratchasima
+74.8,Woonsocket, Rhode Island
+56.48,Landrake, Cornwall.UK
+44.6,Bergen, Norway
+57.2,Chilthorne Domer, Somerset, UK
+80.4,Anthem, AZ
+62.42,Duffel, Belgium
+53.78,Wodonga
+84.74,ST.JOVITE, .MONT TREMBLANT
+57.92,NZ
+73.2,Williamsburg, VA
+60.98,Crondall, Surrey UK
+54.68,iPhone: -37.878723,144.603256
+70.7,
+46.22,Hobart, Tasmania
+53.78,Großenlüder
+52.34,Penrith, Cumbria, England
+89.4,Indiana
+68.0,Lamia, Greece
+59.72,Ashington West Sussex
+87.4,New Orleans, Louisiana
+61.34,Southampton, Hampshire UK
+41.0,Italy
+60.08,Brighstone, Isle of Wight
+51.98,
+77.0,Lorton, VA USA
+88.7,Nebraska
+67.64,Belgium - Brabant - Overijse
+60.8,Stoneleigh / Ewell / Epsom, Su
+58.82,53501 Lantershofen / Ahrweiler
+57.2,Honsolgen
+43.34,Stavanger, Norway
+64.4,South Wonston, Hampshire
+44.6,None
+59.72,None
+32.0,Stroheim / Austria
+83.4,None
+80.1,Lunenburg Ma. 01462
+39.2,None
+62.42,None
+53.96,Melbourne, Victoria, Australia
+55.04,Waterford
+63.5,Union City, CA
+53.24,Folkestone
+55.4,London, GB
+46.4,None
+50.54,Palmerston North
+62.0,Saratoga, CA, USA
+53.78,Dessau
+92.8,
+42.8,Sliedrecht Netherlands
+58.28,Seaford, UK
+44.6,None
+78.8,None
+59.54,None
+53.06,Buxton, UK
+54.5,Birdbrook, Essex
+88.7,
+60.08,Edmonton
+59.36,None
+49.1,new zealands south island
+53.06,Wellington South Africa
+35.6,
+53.42,Vechelde
+46.4,sleen
+62.6,Bournemouth
+63.86,
+56.66,
+96.4,Mouton Cove, Abbeville, LA
+35.6,Megaland, Landgraaf 
+50.0,Dublin, Ireland
+46.4,Oud-Beijerland
+None,Red Deer, Alberta
+61.52,51.51905 N 6.666465 E
+70.9,New Jersey
+49.82,Auckland, New Zealand
+56.3,Landrake, Cornwall.UK
+92.12,Port McNicoll,Ontario,Canada
+37.4,Netherlands, De Bilt
+87.3,Lake Mexia, TX 76667
+68.3,None
+43.88,
+42.8,Zoetermeer,Netherlands
+52.7,
+41.0,None
+61.88,None
+58.28,None
+54.86,Waterford
+51.26,Palmerston North
+43.9,
+55.4,Manukau City
+81.6,Zion, IL
+65.6,Anaheim, CA
+61.88,Auckland NZ
+82.4,Dhaka, Bangladesh
+58.82,Lower Rhine, Germany
+50.54,Oenkerk
+88.6,New Orleans, Louisiana
+87.1,Lake Mexia, TX 76667
+51.4,None
+53.96,
+53.96,Keyingham, UK
+52.88,Ararat, VIC, Australia
+51.26,Lincoln, Christchurch, NZ
+60.0,San Francisco, California
+97.2,Mouton Cove, Abbeville, LA
+35.6,Megaland, Landgraaf 
+68.54,Saint-Egrève
+42.98,Western Isles, Scotland
+35.6,Santa Lucía - Buenos Aires
+56.3,Landrake, Cornwall.UK
+75.0,Tucson, AZ
+44.6,None
+59.72,Port Talbot
+42.8,None
+62.06,Evesham, Worcs
+76.0,Bemidji, MN, USA
+61.88,Bournemouth
+54.68,Waterford
+39.2,
+48.2,None
+53.78,Geelong
+81.2,Zion, IL
+Snoozing Zzzzzz
+64.7,Zion, IL
+56.84,Auckland NZ
+67.46,None
+57.38,Oenkerk
+64.94,Lower Rhine, Germany
+39.2,Preveza - Greece
+60.1,Northern New Hampshire, USA
+73.7,New Orleans, Louisiana
+71.6,Lake Mexia, TX 76667
+44.6,None
+39.2,None
+62.5,Northport, NY, USA
+52.16,Lincoln, Christchurch, NZ
+46.58,Palmerston North
+57.92,Vechelde
+49.28,Western Isles, Scotland
+72.9,Mouton Cove, Abbeville, LA
+33.8,
+37.4,
+85.28,Landrake, Cornwall.UK
+47.84,
+63.14,Chelmsford
+59.9,None
+69.8,Frankfurt, Germany
+78.8,Zurich, Switzerland
+60.4,Hersey, MI
+45.5,
+89.6,Kuala Lumpur, MY
+48.2,Sweden
+62.4,Bemidji, MN, USA
+69.6,Broken Arrow, OK
+59.9,Waterford
+46.4,
+33.8,
+37.4,59.39171,13.537266
+42.8,None
+75.0,Plano, TX
+75.0,Dallas, TX
+66.74,None
+55.0,Del Mar, CA
+56.66,Auckland, New Zealand
+71.0,Fort Worth, TX
+58.1,None
+64.76,Newmarket, Suffolk
+69.0,Arlington, TX
+67.3,None
+66.7,Concord, NC
+60.8,Essen, Germany
+53.42,
+39.2,Megaland, Landgraaf 
+47.7,Laguna Hills, CA
+72.9,Mouton Cove, Abbeville, LA
+97.0,Kolkata, India
+63.5,Driedorf Germany
+55.94,Geelong
+80.24,Saint-Egrève
+80.06,Darwin, Australia
+58.1,34°1′54″S, 150°49′1″E
+67.1,Kaatsheuvel, The Netherlands
+32.0, Buenos Aires, Argentina
+85.64,Landrake, Cornwall.UK
+77.0,Saint Petersburg, FL
+65.8,None
+54.3,Anthem, AZ
+71.6,Bracknell, UK
+64.58,Dieren, Nederland
+69.26,Pößneck, Germany
+69.44,Duffel, Belgium
+47.84,
+66.02,Clevedon, Somerset, UK
+39.2,Preveza - Greece
+55.94,Melbourne, Victoria, Australia
+74.12,Ashington West Sussex
+71.5,Lake Mexia, TX 76667
+65.84,SunnyBank Qld Australia
+57.74,Keyingham, UK
+63.5,Chelmsford
+59.54,None
+65.84,Wijk bij Duurstede
+41.0,Jorwert, Netherlands
+61.0,
+35.6,None
+39.2,Holwerd
+82.4,Beijing, China
+60.26,Waterford
+77.18,Bournemouth
+46.4,Sliedrecht Netherlands
+70.5,
+60.98,Dessau
+72.86,51.85 -2.20
+32.0,Santa Lucía - Buenos Aires
+39.2,None
+71.5,Lake Mexia, TX 76667
+69.8,Broken Arrow, OK
+56.84,Sheffield, United Kingdom
+65.66,Kettering Northamptonshire
+64.4,Brussels, Belgium
+53.7,Tucson, AZ
+45.14,Palmerston North
+39.2,
+69.8,Badalona, Spain
+56.3,Geelong
+54.68,Auckland, New Zealand
+43.0,Aurora, CO
+42.62,Suldal, Norway
+61.2,Pittsburgh, PA
+72.5,None
+86.0,Ibadan, Nigeria
+89.6,Lagos, Nigeria
+58.28,None
+78.8,Basel
+57.02,Paisley, Scotland
+44.6,Holwerd
+78.8,Basel
+69.9,Broken Arrow, OK
+87.8,Algiers, Algeria
+46.4,None
+45.14,Palmerston North
+62.5,Barberton, Oh. (Portage Lakes
+47.8,
+39.2,Megaland, Landgraaf 
+57.2,34°1′54″S, 150°49′1″E
+72.7,Round Rock, Texas
+61.0,63957
+86.0,Maldives
+39.2,None
+61.88, Conwy LL31 9
+62.6,London
+66.56,None
+33.8,Preveza - Greece
+71.5,Lake Mexia, TX 76667
+64.94,SunnyBank Qld Australia
+72.1,Nashua, NH
+71.6,Barcelona, Spain
+64.6,Northport, NY, USA
+80.0,Laredo, TX
+71.6,Badalona, Spain
+52.52,Lincoln, Christchurch, NZ
+44.42,Palmerston North
+75.92,Bournemouth
+73.4,Mouton Cove, Abbeville, LA
+59.18,Vechelde
+69.8,
+68.18,Seaford, UK
+35.6,Santa Lucía - Buenos Aires
+76.28,Landrake, Cornwall.UK
+48.74,
+68.1,Springfield, IL
+56.12,Melbourne, Victoria, Australia
+71.4,Vienna, Austria
+71.4,Lake Mexia, TX 76667
+68.3,Massachusetts
+44.6,None
+60.44,Waterford
+46.4,None
+44.24,Palmerston North
+56.48,Geelong
+46.4,
+42.8,None
+68.0,None
+71.4,Lake Mexia, TX 76667
+60.8,London, United Kingdom
+41.0,Auckland, New Zealand
+91.4,Accra, Ghana
+64.58,ST.JOVITE, .MONT TREMBLANT
+53.6,Ararat, VIC, Australia
+58.1,None
+82.4,Thomassin Haiti & Boston Ma
+45.7,Thornton, CO
+68.7,None
+69.1,Concord, NC
+77.18,Germany - 71720 Oberstenfeld
+43.88,Palmerston North
+55.58,Burgsvik, Gotland, Sweden
+43.52,Auckland, New Zealand
+66.92,Kaatsheuvel, The Netherlands
+81.14,Kressbronn
+83.3,Moschato, Hellas
+78.8,Winterthur
+52.5,
+78.8,Zug
+63.32,Driedorf Germany
+78.8,Solothurn
+64.4,Brunel, London
+78.8,Aarau
+57.38,Belfast Northern Ireland
+90.14,
+56.48,Geelong
+78.8,Frauenfeld
+45.5,Suldal, Norway
+38.48,
+82.4,Basel
+58.28,Sydney, Australia
+66.02,Gold Coast, Australia
+78.8,Luzern
+77.0,St. Gallen
+65.12,Newcastle, Australia
+78.8,Schwyz
+71.42,Sint Hubert, The Netherlands
+78.8,Olten
+41.0,Slovenia
+69.08,None
+33.8,
+73.76,Landrake, Cornwall.UK
+77.7,Saint Petersburg, FL
+64.4,Oxford, United Kingdom
+61.88,Heemskerk
+66.02,Spijkenisse
+55.94,Beach Haven, Auckland, NZ
+65.48,Dieren, Nederland
+77.9,Casselberry, FL
+66.92,Weston-Super-Mare, UK.
+33.8,Preveza - Greece
+70.34,Duffel, Belgium
+53.78,Berwick, Victoria, Australia
+64.76,ST.JOVITE, .MONT TREMBLANT
+73.4,Granbury Texas
+81.32,Lamia, Greece
+72.7,Lunenburg Ma. 01462
+45.32,Hobart, Tasmania
+56.48,iPhone: -37.878723,144.603256
+67.28,53.451560,-2.348959
+50.54,Penrith, Cumbria, England
+71.4,Lake Mexia, TX 76667
+64.58,
+74.2,Jupiter, FL
+66.7,Nebraska
+57.38,Auckland,New Zealand
+41.0,Italy
+77.36,Stoneleigh / Ewell / Epsom, Su
+57.92,St. Peter Port, Guernsey
+70.7,53501 Lantershofen / Ahrweiler
+69.44,Chelmsford
+51.98,None
+65.12,Wijk bij Duurstede
+66.2,Ecatepec, Mexico
+63.7,
+32.0,Stroheim / Austria
+56.48,Derry, Ireland
+69.7,Springhill, LA
+73.22,Uckfield
+70.3,Broken Arrow, OK
+74.3,London, GB
+41.0,None
+63.0,
+75.74,Bournemouth
+71.2,
+56.48,Geelong
+59.18,Vechelde
+68.18,Seaford, UK
+64.6,Pittsburgh, PA
+65.2,Zion, IL
+57.02,Buxton, UK
+68.54,None
+None,Lethbridge, Alberta
+43.52,Palmerston North
+74.5,Mouton Cove, Abbeville, LA
+39.2,Oud-Beijerland
+80.42,Saint-Egrève
+72.9,
+66.9,Baltimore, Maryland
+70.1,
+71.06,51.51905 N 6.666465 E
+46.22,Suldal, Norway
+44.6,None
+33.8,
+48.38,
+56.48,Melbourne, Victoria, Australia
+46.4,Netherlands, De Bilt
+64.4,
+67.8,None
+60.98,Waterford
+49.9,Camas Washington USA
+64.8,Barberton, Oh. (Portage Lakes
+63.14,Driedorf Germany
+72.5,Round Rock, Texas
+56.48,Geelong
+72.0,
+37.4,None
+44.6,None
+59.9,Keyingham, UK
+76.6,Nashua, NH
+52.8,Anaheim, CA
+76.3,None
+52.88,Lincoln, Christchurch, NZ
+43.16,Palmerston North
+75.02,Bournemouth
+75.2,Sevilla, Spain
+47.12,Western Isles, Scotland
+51.62,Elvington,York, England
+68.36,Seaford, UK
+46.4,Suldal, Norway
+33.8,
+66.92,Landrake, Cornwall.UK
+48.38,
+55.4,Dublin, Ireland
+42.8,None
+33.8,Sweden
+55.0,Chandler, AZ
+61.34,Waterford
+32.72,Mossel Bay, Western Cape
+41.0,None
+42.98,Palmerston North
+62.0,Mesa, AZ
+67.64,
+69.8,Taunton, Somerset. UK
+64.4,New Jersey
+42.8,59.39171,13.537266
+41.0,None
+42.8,Auckland, New Zealand
+33.8,
+49.0,Tacoma, WA
+70.52,None
+46.4,Holwerd
+42.8,
+43.16,Palmerston North
+75.92,San Pedro, Murcia, Spain
+43.88,Auckland, New Zealand
+32.0,Megaland, Landgraaf 
+76.1,Mouton Cove, Abbeville, LA
+56.48,Geelong
+59.0,Adelaide, Australia
+79.34,Darwin, Australia
+74.7,
+55.94,34°1′54″S, 150°49′1″E
+80.42,Saint-Egrève
+57.74,Beemster
+69.4,63957
+46.4, Buenos Aires, Argentina
+42.98,Suldal, Norway
+39.2,
+78.8,Saint Petersburg, FL
+66.6,None
+52.5,Anthem, AZ
+66.74,Dieren, Nederland
+71.78,Pößneck, Germany
+56.0,Sunrise Manor, NV
+66.7,Williamsburg, VA
+54.32,Berwick, Victoria, Australia
+39.2,Preveza - Greece
+56.48,Melbourne, Victoria, Australia
+65.7,Baltimore, Maryland
+48.02,
+75.02,Ashington West Sussex
+68.36,Brighstone, Isle of Wight
+79.2,New Orleans, Louisiana
+57.38,Auckland,New Zealand
+58.64,Medemblik
+68.9,Chelmsford
+51.0,Henderson, NV
+66.2,Mexico City
+46.4,Stroheim / Austria
+84.2,Chennai, India
+57.92,Keyingham, UK
+37.4,None
+71.6,Broken Arrow, OK
+61.52,Waterford
+77.2,Bahamas
+57.56,Kingsgrove
+42.8,None
+32.0,
+43.16,Palmerston North
+56.48,Geelong
+61.0,
+62.78,Folkestone
+54.86,Victoria, Australia
+52.34,None
+75.1,Oviedo, FL
+57.02,Wentworthville, NSW  Australia
+80.78,Saint-Egrève
+55.76,Auckland, New Zealand
+53.5,Tucson, AZ
+45.86,Suldal, Norway
+38.12,Auckland, New Zealand
+32.0,
+67.1,Landrake, Cornwall.UK
+56.0,Del Mar, CA
+68.2,None
+35.6,Zoetermeer,Netherlands
+67.1,Pittsburgh, PA
+35.6,None
+48.2,
+35.6,None
+72.5,Broken Arrow, OK
+61.88,Waterford
+32.0,None
+43.52,Palmerston North
+48.3,
+62.42,Driedorf Germany
+42.8,Megaland, Landgraaf 
+73.0,Round Rock, Texas
+55.04,34°1′54″S, 150°49′1″E
+56.48,Geelong
+73.6,63957
+35.6,Preveza - Greece
+50.0,Fontana, CA
+41.0,None
+67.46,None
+70.3,Northern New Hampshire, USA
+62.24,
+53.0,La Jolla, CA
+47.0,Lancaster, CA
+50.0,San Diego, CA
+53.42,Ararat, VIC, Australia
+86.0,Maldives
+58.28,Keyingham, UK
+51.0,Anaheim, CA
+67.9,Northport, NY, USA
+54.0,Santa Ana, CA
+77.0,Cozumel Island
+53.06,Lincoln, Christchurch, NZ
+51.0,Glendale, CA
+51.0,Long Beach, CA
+55.0,Los Angeles, CA
+51.0,Pasadena, CA
+43.52,Palmerston North
+75.02,Bournemouth
+86.0,Conakry, Guinea
+41.0,Santa Lucía - Buenos Aires
+42.8,Suldal, Norway
+37.4,
+44.1,Boise Idaho
+68.18,Chelmsford
+56.66,NZ
+41.0,None
+57.56,
+39.2,None
+43.34,Palmerston North
+51.0,San Jose, CA
+57.92,Houghton le Spring UK 
+68.8,Zion, IL
+76.64,Taunton, Somerset. UK
+50.0,Fremont, CA
+72.7,Lake Mexia, TX 76667
+67.46,None
+48.0,Monterey, CA
+70.88,None
+74.3,Hurdland, Missouri
+44.6,
+Snoozing Zzzzzz
+76.4,Springfield, IL
+91.0,77002, USA, Earth
+56.12,Melbourne, Victoria, Australia
+91.0,77002 TX, USA
+60.8,Dresden
+78.8,
+66.2,Chelmsford
+57.38,NZ
+45.0,Boise Idaho
+37.4,None
+57.2,Seesen - niedersachsen
+76.1,Vienna, Austria
+66.56,Bundaberg
+57.92,
+77.9,Broken Arrow, OK
+57.2,
+70.6,Zion, IL
+78.08,Taunton, Somerset. UK
+42.8,None
+58.28,Glenrothes, Fife, UK
+48.2,Auckland, New Zealand
+55.0,Del Mar, CA
+71.6,None
+53.06,Ararat, VIC, Australia
+58.1,Auckland, New Zealand
+74.7,None
+73.94,San Pedro, Murcia, Spain
+42.8,Megaland, Landgraaf 
+85.1,Kressbronn
+80.6,Moschato, Hellas
+80.6,Winterthur
+63.86,Driedorf Germany
+59.36,Belfast Northern Ireland
+78.26,
+60.3,Denver, CO, USA
+80.6,Zug
+83.3,Saint-Egrève
+53.24,34°1′54″S, 150°49′1″E
+73.0,None
+56.84,Geelong
+82.4,Solothurn
+56.3,Blacktown, NSW, Australia
+61.34,Beemster
+72.0,
+53.6,
+59.72,Brisbane, Australia
+80.6,Aarau
+81.5,Chalkis, Evia
+53.78,Wangerooge
+52.52,Canberra, Australia
+33.8,
+44.42,Hobart, Australia
+75.5,Muskegon, MI
+212.0,Newcastle, Australia
+48.02,Perth, Australia
+58.46,None
+80.6,Frauenfeld
+57.56,Sydney, Australia
+71.6,Sint Hubert, The Netherlands
+68.9,None
+87.8,Pakchong,Nakhon Ratchasima
+80.6,Konstanz
+64.4,Gold Coast, Australia
+81.0,Woonsocket, Rhode Island
+84.2,Basel
+77.4,Fairview, TN
+48.2,Bergen, Norway
+74.0,Nocona, Texas, United States
+73.04,Chilthorne Domer, Somerset, UK
+33.8,
+82.4,Olten
+82.58,Esslingen
+68.54,Den Haag
+82.0,Saint Petersburg, FL
+68.0,Spijkenisse
+55.22,Beach Haven, Auckland, NZ
+55.0,Anthem, AZ
+82.76,Thun, Switzerland
+55.58,Berwick, Victoria, Australia
+46.58,
+71.78,Weston-Super-Mare, UK.
+57.38,Alford, Aberdeenshire
+67.64,Zuid-Holland, Lansingerland
+33.8,Preveza - Greece
+65.48,53.451560,-2.348959
+69.0,Williamsburg, VA
+70.88,Southampton, Hampshire UK
+70.88,Crondall, Surrey UK
+72.14,Ashington West Sussex
+51.44,Penrith, Cumbria, England
+75.1,Lake Mexia, TX 76667
+67.1,
+67.0,Baltimore, Maryland
+69.98,Brighstone, Isle of Wight
+78.7,Pre: 44.108575,-88.526847
+71.2,Lorton, VA USA
+55.76,Auckland,New Zealand
+79.2,
+62.24,Heist aan zee
+64.76,Chelmsford
+52.88,None
+67.1,Wijk bij Duurstede
+61.7,Platres, Cyprus
+75.6,Plano, TX - USA
+77.36,Honsolgen
+78.6,
+59.0,Keyingham, UK
+78.5,Lakeville, MN USA
+68.0,Greens Fork, Indiana
+77.3,Brookhaven, NY
+37.4,85123 Grillheim
+77.4,Lunenburg Ma. 01462
+76.3,None
+42.8,Stroheim / Austria
+39.2,None
+60.08,SunnyBank Qld Australia
+72.14,UK
+65.66,Waterford
+78.1,Broken Arrow, OK
+52.5,Union City, CA
+65.12,Heemskerk
+69.8,Northampton
+61.52,
+72.32,London, GB
+75.92,Bournemouth
+51.0,Saratoga, CA, USA
+62.6,Dessau
+82.2,
+37.4,Sliedrecht Netherlands
+71.6,
+111.2,Faisalabad, Pakistan
+61.16,Vechelde
+54.14,Buxton, UK
+66.2,
+66.2,
+75.1,Lake Mexia, TX 76667
+83.2,New Orleans, Louisiana
+None,Edmonton, Alberta
+59.72,Weymouth, UK
+75.5,Milwaukee, Wisconsin
+52.88,Ararat, VIC, Australia
+40.28,None
+64.94,Wellington South Africa
+None,Lethbridge, Alberta
+50.0,beverly hills CA
+35.6,sleen
+64.04,Ireland
+75.02,Furzehill, Dorset
+44.6,Holwerd
+73.4,Pittsburgh, PA
+78.4,ankeny, iowa
+84.6,Mouton Cove, Abbeville, LA
+37.4,Oud-Beijerland
+73.58,Aberthin, South Wales. UK
+56.84,Geelong
+83.84,Saint-Egrève
+52.88,Auckland, New Zealand
+41.18,Suldal, Norway
+42.8,Italy
+57.74,Auckland, New Zealand
+48.74,Edmonton
+49.64,None
+104.0,Islamabad, Pakistan
+76.82,None
+56.12,Melbourne, Victoria, Australia
+69.9,None
+75.3,Lake Mexia, TX 76667
+66.6,Baltimore, Maryland
+55.2,San Diego Ca USA
+81.1,
+66.02,Chelmsford
+64.4,Düsseldorf
+41.0,None
+58.82,Auckland, New Zealand
+80.9,Mission, Tx
+78.8,Broken Arrow, OK
+44.6,België
+66.2,Waterford
+83.5,63957
+48.2,None
+78.4,Massachusetts
+49.9,Camas Washington USA
+73.4,Barberton, Oh. (Portage Lakes
+59.0,Manukau City
+53.42,34°1′54″S, 150°49′1″E
+77.2,Round Rock, Texas
+57.02,Geelong
+81.0,Brownsville, Tx
+71.8,Zion, IL
+58.46,None
+59.0,Christchurch
+51.8,Christchurch
+53.6,Christchurch
+50.0,Christchurch
+61.16,Dorset, England
+51.44,Brampton, Cumbria, UK
+57.74,Auckland NZ
+57.2,Christchurch
+48.2,Christchurch
+48.2,Christchurch
+50.0,Christchurch
+55.4,Christchurch
+32.0,None
+57.2,Christchurch
+60.8,Christchurch
+63.0,Coventry, England.
+59.0,Brisbane
+53.6,Brisbane
+75.2,Brisbane
+75.2,Brisbane
+78.8,Brisbane
+55.4,Brisbane
+77.0,Brisbane
+77.3,La Joya, Tx
+60.8,Brisbane
+67.82,Lower Rhine, Germany
+53.6,Brisbane
+39.2,Preveza - Greece
+55.4,Brisbane
+51.8,Brisbane
+57.56,Oenkerk
+75.2,Brisbane
+75.4,Lake Mexia, TX 76667
+59.36,SunnyBank Qld Australia
+60.08,
+67.1,None
+32.0,None
+58.82,Keyingham, UK
+52.88,Ararat, VIC, Australia
+74.9,Northport, NY, USA
+52.7,Lincoln, Christchurch, NZ
+44.24,Palmerston North
+57.0,Del Mar, CA
+75.38,Bournemouth
+49.28,Western Isles, Scotland
+33.8,Sliedrecht Netherlands
+53.6,None
+32.0,
+80.8,None
+69.98,Landrake, Cornwall.UK
+61.34,Vechelde
+68.0,London
+46.22,
+75.5,Lake Mexia, TX 76667
+56.6,Anaheim, CA
+123.8,Quetta, Pakistan
+46.4,Sweden
+68.6,Bemidji, MN, USA
+86.54,Cairns
+33.8,
+44.42,Palmerston North
+68.9,
+72.1,Zion, IL
+77.54,Taunton, Somerset. UK
+37.4,59.39171,13.537266
+75.7,Lake Mexia, TX 76667
+72.3,New Jersey
+48.2,Auckland, New Zealand
+67.28,None
+75.92,Lymington, UK
+76.7,Hersey, MI
+84.2,Kabul, Afghanistan
+48.2,Holwerd
+84.2,Salvador, Brazil
+44.42,Palmerston North
+42.8,
+57.02,Auckland, New Zealand
+42.8,Megaland, Landgraaf 
+86.2,Mouton Cove, Abbeville, LA
+54.3,Laguna Hills, CA
+69.98,Reading
+81.0,Woonsocket, Rhode Island
+57.02,Geelong
+84.38,Saint-Egrève
+58.64,Adelaide, Australia
+76.8,
+55.58,Blacktown, NSW, Australia
+78.8,Darwin, Australia
+53.06,34°1′54″S, 150°49′1″E
+67.28,Kaatsheuvel, The Netherlands
+58.82,Beemster
+58.28,None
+77.0,Trimble, MO
+57.38,Newcastle, Australia
+41.72,Suldal, Norway
+46.4,
+68.72,Landrake, Cornwall.UK
+58.5,Anthem, AZ
+75.56,Bracknell, UK
+66.56,Dieren, Nederland
+53.6,Wodonga
+55.94,Berwick, Victoria, Australia
+46.22,
+69.62,Brighstone, Isle of Wight
+75.9,Lake Mexia, TX 76667
+73.4,Ashington West Sussex
+55.76,Auckland,New Zealand
+56.48,None
+58.82,SunnyBank Qld Australia
+81.0,
+64.4,Chelmsford
+32.0,Jorwert, Netherlands
+66.38,Wijk bij Duurstede
+76.64,Porthmadog, Gwynedd
+75.92,South Wonston, Hampshire
+46.4,Stroheim / Austria
+58.28,Keyingham, UK
+33.8,None
+69.8,Badalona, Spain
+79.0,Broken Arrow, OK
+61.52,
+32.0,
+75.56,Bournemouth
+32.0,Sliedrecht Netherlands
+39.2,Santa Lucía - Buenos Aires
+46.4,None
+61.88,Folkestone
+76.1,Lake Mexia, TX 76667
+83.8,New Orleans, Louisiana
+59.72,Weymouth, UK
+66.56,None
+70.0,
+52.88,Ararat, VIC, Australia
+76.7,Oviedo, FL
+37.4,Holwerd
+60.98,53.024647, -2.204434
+44.6,Palmerston North
+57.56,Keyingham, UK
+57.2,Geelong
+84.38,Saint-Egrève
+53.96,Auckland, New Zealand
+48.2,Italy
+69.26,Landrake, Cornwall.UK
+65.12,Auckland, New Zealand
+76.3,Lake Mexia, TX 76667
+70.4,None
+39.2,Zoetermeer,Netherlands
+41.0,None
+62.1,Tucson, AZ
+58.64,Auckland, New Zealand
+None,Lethbridge, Alberta
+77.18,-6.097813, 177.331939
+63.32,Driedorf Germany
+78.3,Round Rock, Texas
+57.2,Geelong
+58.46,None
+51.26,Brampton, Cumbria, UK
+80.6,Tashkent, Uzbekistan
+32.0,None
+59.54,SunnyBank Qld Australia
+59.54,
+52.88,Ararat, VIC, Australia
+76.7,Northport, NY, USA
+52.88,Lincoln, Christchurch, NZ
+73.76,Bournemouth
+56.12,Clayton West
+41.0,Sliedrecht Netherlands
+87.1,Mouton Cove, Abbeville, LA
+68.36,Seaford, UK
+84.74,Saint-Egrève
+48.2,Adlkofen
+58.82,Freuchie, Cupar, Fife
+32.0,
+67.64,Landrake, Cornwall.UK
+84.2,Maldives
+46.58,
+76.6,Lake Mexia, TX 76667
+61.34,Vechelde
+80.8,
+62.96,Chelmsford
+57.74,NZ
+39.2,None
+83.9,Nashua, NH
+68.18,Evesham, Worcs
+67.7,Vienna, Austria
+58.28,
+69.9,Bemidji, MN, USA
+69.26,Hardingstone, England
+45.32,Palmerston North
+73.2,Zion, IL
+75.56,Taunton, Somerset. UK
+72.5,Frampton-on-Severn, Glos
+76.8,Lake Mexia, TX 76667
+57.92,Glenrothes, Fife, UK
+48.2,Auckland, New Zealand
+66.38,None
+52.88,Ararat, VIC, Australia
+72.14,None
+65.48,London UK
+79.1,Muskegon, MI
+56.48,Burgsvik, Gotland, Sweden
+56.12,Auckland, New Zealand
+66.74,Kaatsheuvel, The Netherlands
+84.92,Kressbronn
+58.1,Laguna Hills, CA
+88.5,Mouton Cove, Abbeville, LA
+78.26,
+82.4,Solothurn
+57.38,Belfast Northern Ireland
+66.9,Denver, CO, USA
+53.06,34°1′54″S, 150°49′1″E
+75.9,None
+78.7,None
+78.7,None
+86.4,Woonsocket, Rhode Island
+54.68,Blacktown, NSW, Australia
+57.38,Geelong
+48.92,
+53.78,Wangerooge
+82.4,Frauenfeld
+81.68,Chalkis, Evia
+52.7,Canberra, Australia
+44.42,Hobart, Australia
+82.4,Konstanz
+82.4,Basel
+82.4,Bern
+57.38,Newcastle, Australia
+53.24,Melbourne, Australia
+82.4,Luzern
+46.94,Perth, Australia
+57.2,Sydney, Australia
+66.0,Coachella Valley, California
+84.56,Pakchong,Nakhon Ratchasima
+71.42,Sint Hubert, The Netherlands
+42.8,Slovenia
+82.4,Olten
+75.7,Fairview, TN
+75.74,Chilthorne Domer, Somerset, UK
+44.6,
+64.04,Landrake, Cornwall.UK
+84.4,Saint Petersburg, FL
+61.2,Anthem, AZ
+72.14,Pößneck, Germany
+66.2,Dieren, Nederland
+50.36,
+53.96,Wodonga
+77.0,Casselberry, FL
+71.24,Poole, Southern England
+55.94,Berwick, Victoria, Australia
+79.34,ST.JOVITE, .MONT TREMBLANT
+46.76,
+70.5,Williamsburg, VA
+70.7,Duffel, Belgium
+68.72,53.451560,-2.348959
+48.4,Angels Camp, CA, USA
+71.78,Tunbridge Wells, Kent, UK
+83.12,Lamia, Greece
+71.78,Weston-Super-Mare, UK.
+42.98,Hobart, Tasmania
+35.6,Preveza - Greece
+51.44,Penrith, Cumbria, England
+73.22,Ashington West Sussex
+67.1,
+77.0,Lake Mexia, TX 76667
+66.74,Gloucester UK
+78.62,None
+58.64,Medemblik
+70.9,Statesville, NC
+77.72,Stoneleigh / Ewell / Epsom, Su
+66.4,
+61.88,Heist aan zee
+81.9,
+74.66,Windhoek
+65.66,Wijk bij Duurstede
+76.46,Honsolgen
+81.6,Lakeville, MN USA
+57.38,Keyingham, UK
+78.5,None
+46.4,Kristianstad, Sweden
+61.88,Platres, Cyprus
+39.2,Stroheim / Austria
+48.2,None
+58.64,Derry, Ireland
+71.42,Uckfield
+69.26,Waterford
+49.0,Forks WA 98331
+57.2,Filey, North Yorkshire, UK
+66.92,London, GB
+81.2,Broken Arrow, OK
+32.0,None
+45.5,Palmerston North
+41.0,Sliedrecht Netherlands
+61.52,Dessau
+54.0,Saratoga, CA, USA
+86.2,
+68.36,Seaford, UK
+57.38,Geelong
+42.8,Santa Lucía - Buenos Aires
+57.56,Buxton, UK
+78.8,None
+45.5,None
+None,Edmonton, Alberta
+60.8,Vechelde
+59.9,Weymouth, UK
+66.56,None
+39.2,sleen
+74.84,Furzehill, Dorset
+42.8,Holwerd
+45.68,Palmerston North
+79.2,Milwaukee, Wisconsin
+65.48,San Antonio de Areco Argentina
+89.1,Mouton Cove, Abbeville, LA
+32.0,Oud-Beijerland
+32.0,52°51'36''N 008°09'02''E
+53.06,Auckland, New Zealand
+42.62,Suldal, Norway
+51.7,Puyallup, WA
+64.04,Auckland, New Zealand
+32.0,
+71.6,None
+77.1,Lake Mexia, TX 76667
+66.56,Gloucester UK
+32.0,Zoetermeer,Netherlands
+61.88,Chelmsford
+None,Red Deer, Alberta
+80.6,Mashhad, Iran
+77.5,
+56.66,Skegness
+37.4,None
+45.5,Palmerston North
+75.6,Barberton, Oh. (Portage Lakes
+42.8,Megaland, Landgraaf 
+59.0,Manukau City
+78.3,Round Rock, Texas
+52.34,34°1′54″S, 150°49′1″E
+57.38,Geelong
+57.92,None
+57.38,Auckland NZ
+59.9,Dorset, England
+37.4,None
+58.82,Oenkerk
+39.2,Preveza - Greece
+77.3,Lake Mexia, TX 76667
+80.4,Northern New Hampshire, USA
+59.36,SunnyBank Qld Australia
+59.72,
+66.2,None
+42.8,None
+56.66,Keyingham, UK
+53.06,Ararat, VIC, Australia
+46.4,
+52.88,Lincoln, Christchurch, NZ
+74.8,Auxvasse, Missouri
+35.6,Holwerd
+71.96,Bournemouth
+49.28,Western Isles, Scotland
+32.0,Sliedrecht Netherlands
+89.4,Mouton Cove, Abbeville, LA
+48.02,Edmonton
+57.2,Geelong
+67.82,Seaford, UK
+48.2,Santa Lucía - Buenos Aires
+42.08,Suldal, Norway
+46.4,
+37.4,
+65.3,Landrake, Cornwall.UK
+46.76,
+77.3,Lake Mexia, TX 76667
+84.5,New Orleans, Louisiana
+66.38,Gloucester UK
+62.24,Chelmsford
+None,Netherlands
+46.4,None
+67.64,Evesham, Worcs
+46.4,Sweden
+71.7,Bemidji, MN, USA
+59.4,Anaheim, CA
+33.8,
+93.2,Mogadishu, Somalia
+54.5,San Francisco, California
+74.84,Taunton, Somerset. UK
+74.8,Zion, IL
+77.4,Lake Mexia, TX 76667
+66.74,None
+72.14,None
+53.6,None
+57.74,Auckland, New Zealand
+66.2,Johannesburg, ZA
+64.58,Newmarket, Suffolk
+79.7,None
+39.2,Holwerd
+48.2,
+57.74,Auckland, New Zealand
+89.8,Mouton Cove, Abbeville, LA
+32.0,Megaland, Landgraaf 
+68.18,Reading
+79.7,None
+57.02,Geelong
+52.16,34°1′54″S, 150°49′1″E
+78.8,Darwin, Australia
+60.08,Beemster
+66.74,Kaatsheuvel, The Netherlands
+86.4,Woonsocket, Rhode Island
+57.74,None
+42.8, Buenos Aires, Argentina
+41.54,Suldal, Norway
+65.48,Landrake, Cornwall.UK
+85.6,Saint Petersburg, FL
+68.2,None
+79.0,Hersey, MI
+65.1,Anthem, AZ
+73.94,Bracknell, UK
+66.92,Dieren, Nederland
+72.14,Pößneck, Germany
+54.32,Wodonga
+55.94,Berwick, Victoria, Australia
+46.76,
+70.88,Duffel, Belgium
+71.6,Clevedon, Somerset, UK
+54.5,Melbourne, Victoria, Australia
+37.4,Preveza - Greece
+71.78,Ashington West Sussex
+69.4,Baltimore, Maryland
+66.2,Gloucester UK
+59.54,SunnyBank Qld Australia
+55.4,Auckland,New Zealand
+86.7,Massachusetts
+81.5,
+51.8,Christchurch
+61.7,Chelmsford
+51.8,Christchurch
+59.0,Christchurch
+50.0,Christchurch
+33.8,Jorwert, Netherlands
+57.2,Christchurch
+55.4,55.89079, -4.61601
+48.2,Christchurch
+57.2,Christchurch
+53.6,Christchurch
+50.0,Christchurch
+57.2,Christchurch
+57.2,Christchurch
+67.82,Worsley, Manchester
+57.2,Brisbane
+57.2,Keyingham, UK
+53.6,Brisbane
+60.8,Brisbane
+51.8,Brisbane
+75.2,Brisbane
+53.6,Brisbane
+78.8,Brisbane
+60.8,Brisbane
+51.8,Brisbane
+57.2,Brisbane
+53.6,Brisbane
+75.2,Brisbane
+
+
+
+
+
+
+
+

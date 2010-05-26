@@ -14,3 +14,20 @@ class FieldDescriptor():
         self.field_type = field_type
         self.aggregate_factory = aggregate_factory
         self.function = function
+        self.visible = True
+    def __eq__(self, other):
+        if isinstance(other, FieldDescriptor):
+            return (self.alias == other.alias) and \
+               (self.underlying_fields == other.underlying_fields) and \
+               (self.field_type == other.field_type) and \
+               (self.aggregate_factory == other.aggregate_factory) and \
+               (self.function == other.function)
+        else:
+            return NotImplemented
+    def __ne__(self, other):
+        result = self.__eq__(other)
+        if result is NotImplemented:
+            return result
+        else:
+            return not result
+
