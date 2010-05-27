@@ -10,3 +10,4 @@ MAX_MESSAGES = 10000
 TWEET_GROUP_ID = 'tweet-group-id'
 TO_INDEX = 'tweet-groups-to-index'
 CONSUMED_INDICES = 'tweet-groups-consumed'
+#badar
