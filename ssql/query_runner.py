@@ -1,9 +1,9 @@
 from getpass import getpass
 from ssql.operators import StatusSource
 from ssql.query_builder import gen_query_builder
+from ssql.tuple_descriptor import Tuple
 from threading import RLock
 from threading import Thread
-from tuple import Tuple
 from tweepy import StreamListener
 from tweepy import Stream
 
@@ -26,13 +26,13 @@ class QueryRunner(StreamListener):
                              snooze_time = 1.0) # wait 1s if timeout in 600s
     def run_built_query(self, query_built):
         self.query = query_built
-        # TODO: stop old query
         if self.query.source == StatusSource.TWITTER_FILTER:
             (follow_ids, track_words) = self.query.query_tree.filter_params()
             self.stream.filter(follow_ids, track_words, True)
         elif self.query.source == StatusSource.TWITTER_SAMPLE:
             self.stream.sample(None, True)
     def run_query(self, query_str):
+        query_str = unicode(query_str, 'utf-8')
         query_built = self.query_builder.build(query_str)
         self.run_built_query(query_built)
     def stop_query(self):
@@ -51,7 +51,11 @@ class QueryRunner(StreamListener):
     """ StreamListener methods """
     def on_status(self, status):
         self.status_lock.acquire()
-        self.statuses.append(Tuple(status, None))
+        t = Tuple()
+        t.set_tuple_descriptor(None)
+        t.set_data(None)
+        t.set_data(status.__dict__)
+        self.statuses.append(t)
         if len(self.statuses) > self.batch_size:
             self.flush_statuses()
         self.status_lock.release()
@@ -64,4 +68,9 @@ class QueryRunner(StreamListener):
 class PrintStatusHandler(object):
     def handle_statuses(self, statuses):
         for status in statuses:
-            print status.text
+            td = status.get_tuple_descriptor()
+            vals = []
+            for alias in td.aliases:
+                if td.get_descriptor(alias).visible:
+                    vals.append(unicode(getattr(status, alias)))
+            print u",".join(vals)

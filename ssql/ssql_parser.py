@@ -1,29 +1,35 @@
 # Started with http://pyparsing.wikispaces.com/file/view/simpleSQL.py 
 # ( Copyright (c) 2003, Paul McGuire ) and extended from there
 #
-from pyparsing import Literal, CaselessLiteral, Word, Upcase, delimitedList, Optional, \
+from pyparsing import Literal, CaselessLiteral, Word, upcaseTokens, delimitedList, Optional, \
     Combine, Group, alphas, nums, alphanums, ParseException, Forward, oneOf, quotedString, \
-    ZeroOrMore, restOfLine, Keyword
+    ZeroOrMore, restOfLine, Keyword, removeQuotes
+from ssql.query import QueryTokens
 
 def gen_parser():
     # define SQL tokens
     selectStmt = Forward()
-    selectToken = Keyword("select", caseless=True)
-    fromToken   = Keyword("from", caseless=True)
+    selectToken = Keyword(QueryTokens.SELECT, caseless=True)
+    fromToken   = Keyword(QueryTokens.FROM, caseless=True)
+    groupByToken   = Keyword(QueryTokens.GROUPBY, caseless=True)
+    asToken = Keyword(QueryTokens.AS, caseless=True).setParseAction(upcaseTokens)
 
     ident          = Word( alphas, alphanums + "_$" ).setName("identifier")
-    columnName     = Upcase( delimitedList( ident, ".", combine=True ) )
-    columnNameList = Group( delimitedList( columnName ) )
-    tableName      = Upcase( delimitedList( ident, ".", combine=True ) )
+    columnName     = delimitedList( ident, ".", combine=True )
+    columnExpression = Forward()
+    columnFunction = Word(alphas, alphanums) + "(" + delimitedList(columnExpression) + ")" 
+    columnExpression << Group ( (columnFunction | columnName) + Optional( asToken + columnName ) )
+    columnExpressionList = Group( delimitedList( columnExpression ) )
+    tableName      = delimitedList( ident, ".", combine=True ).setParseAction(upcaseTokens)
     tableNameList  = Group( delimitedList( tableName ) )
 
     whereExpression = Forward()
-    and_ = Keyword("and", caseless=True)
-    or_ = Keyword("or", caseless=True)
-    in_ = Keyword("in", caseless=True)
+    and_ = Keyword(QueryTokens.AND, caseless=True).setParseAction(upcaseTokens)
+    or_ = Keyword(QueryTokens.OR, caseless=True).setParseAction(upcaseTokens)
+    in_ = Keyword(QueryTokens.IN, caseless=True).setParseAction(upcaseTokens)
 
     E = CaselessLiteral("E")
-    binop = oneOf("= != < > >= <= eq ne lt le gt ge contains", caseless=True)
+    binop = oneOf("= != < > >= <= eq ne lt le gt ge %s" % (QueryTokens.CONTAINS), caseless=True).setParseAction(upcaseTokens)
     arithSign = Word("+-",exact=1)
     realNum = Combine( Optional(arithSign) + ( Word( nums ) + "." + Optional( Word(nums) )  |
                 ( "." + Word(nums) ) ) + 
@@ -31,21 +37,22 @@ def gen_parser():
     intNum = Combine( Optional(arithSign) + Word( nums ) + 
             Optional( E + Optional("+") + Word(nums) ) )
 
-    columnRval = realNum | intNum | quotedString | columnName 
+    columnRval = realNum | intNum | columnExpression | quotedString.setParseAction(removeQuotes)
     whereCondition = Group(
-            ( columnName + binop + columnRval ) |
-            ( columnName + in_ + "(" + delimitedList( columnRval ) + ")" ) |
-            ( columnName + in_ + "(" + selectStmt + ")" ) |
+            ( columnExpression + binop + columnRval ).setParseAction(label(QueryTokens.WHERE_CONDITION)) |
+            ( columnExpression + in_ + "(" + delimitedList( columnRval ) + ")" ).setParseAction(label(QueryTokens.WHERE_CONDITION)) |
+            ( columnExpression + in_ + "(" + selectStmt + ")" ).setParseAction(label(QueryTokens.WHERE_CONDITION)) |
             ( "(" + whereExpression + ")" )
             )
     whereExpression << whereCondition + ZeroOrMore( ( and_ | or_ ) + whereExpression ) 
 
     # define the grammar
-    selectStmt      << ( selectToken + 
-            ( '*' | columnNameList ).setResultsName( "fields" ) + 
+    selectStmt      << (  
+            Group ( selectToken + columnExpressionList ).setResultsName( "select" ) + 
             fromToken + 
             tableNameList.setResultsName( "sources" ) + 
-            Optional( Group( CaselessLiteral("where") + whereExpression ), "" ).setResultsName("where") )
+            Optional( Group( CaselessLiteral(QueryTokens.WHERE) + whereExpression ), "" ).setResultsName("where") +
+            Optional (Group( groupByToken + columnExpressionList ), "").setResultsName("groupby") )
 
     parser = selectStmt
 
@@ -68,6 +75,16 @@ def test( str ):
         print " "*err.loc + "^\n" + err.msg
         print err
     print
+
+def label(l):
+    """
+        Returns a parseaction which prepends the tokens with the label l
+    """
+    def action(string, loc, tokens):
+        newlist = [l]
+        newlist.extend(tokens)
+        return newlist
+    return action
 
 def runtests():
     test( "SELECT * from XYZZY, ABC" )

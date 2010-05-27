@@ -1,9 +1,11 @@
 from ssql.query_runner import QueryRunner
 from ssql.query_runner import PrintStatusHandler
+from ssql.builtin_functions import register
 from time import sleep
 
 def main():
-    runner = QueryRunner(PrintStatusHandler(), 10)
+    register()
+    runner = QueryRunner(PrintStatusHandler(), batch_size=1)
     try:
         while True:
             cmd = raw_input("ssql> ");
