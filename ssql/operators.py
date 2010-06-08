@@ -136,7 +136,7 @@ class Not(QueryOperator):
         (passes, fails) = self.child.filter(updates, return_fails, return_passes)
         return (fails, passes)
     def filter_params(self):
-        return child.filter_params()
+        return self.child.filter_params()
     def can_query_stream(self):
         return self.child.can_query_stream()
     def assign_descriptor(self, tuple_descriptor):

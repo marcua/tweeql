@@ -162,7 +162,7 @@ class QueryBuilder:
             if window == None:
                 raise QueryException("Aggregate expression provided with no WINDOW parameter")
             for field in groupby:
-                (field_descriptors, verify) = self.__parse_field(field, tuple_descriptor, True, False)
+                (field_descriptors, verify) = self.__parse_field(field, tuple_descriptor, True, True)
                 group_descriptor.add_descriptor_list(field_descriptors)
             for alias in select_descriptor.aliases:
                 select_field = select_descriptor.get_descriptor(alias)

@@ -28,11 +28,14 @@ class QueryRunner(StreamListener):
     def run_built_query(self, query_built):
         self.query = query_built
         if self.query.source == StatusSource.TWITTER_FILTER:
+            no_filter_exception = QueryException("You haven't specified any filters that can query Twitter.  Perhaps you want to query TWITTER_SAMPLE?")
             try:
                 (follow_ids, track_words) = self.query.query_tree.filter_params()
+                if (follow_ids == None) and (track_words == [None]):
+                    raise no_filter_exception
                 self.stream.filter(follow_ids, track_words, True)
             except NotImplementedError:
-                raise QueryException("You haven't specified any filters that can query Twitter.  Perhaps you want to query TWITTER_SAMPLE?")
+                raise no_filter_exception
         elif self.query.source == StatusSource.TWITTER_SAMPLE:
             self.stream.sample(None, True)
     def run_query(self, query_str):

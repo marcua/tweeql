@@ -23,8 +23,19 @@ class Aggregator():
                 self.window = AggregateWindow(update.created_at, update.created_at + self.windowsize)
             # ignore all entries before the window
             test = self.window.windowtest(update.created_at)
+            if test == AggregateWindowResult.AFTER:
+                if output is self.emptylist:
+                    output = []
+                for bucket, aggs in self.buckets.items():
+                    bucket.set_tuple_descriptor(self.tuple_descriptor)
+                    for k,v in aggs.items():
+                        setattr(bucket, k, v.value())
+                    output.append(bucket)
+                self.buckets = {}
+                while self.window.windowtest(update.created_at) != AggregateWindowResult.IN:
+                    self.window.advance(self.windowsize)
+                test = AggregateWindowResult.IN
             if test == AggregateWindowResult.IN:
-                print "1"
                 bucket = update.generate_from_descriptor(self.groupby)
                 if bucket not in self.buckets:
                     aggs = dict()
@@ -35,11 +46,6 @@ class Aggregator():
                     self.buckets[bucket] = aggs
                 for aggregate in self.buckets[bucket].values():
                     aggregate.update(update)
-            elif test == AggregateWindowResult.AFTER:
-                print "2"
-                self.window.advance(self.windowsize)
-                for bucket in self.buckets:
-                    pass 
         self.update_lock.release()
         return output
 
