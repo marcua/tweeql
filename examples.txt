@@ -1,3 +1,5 @@
+select text from twitter_sample;
+select location, text from twitter_sample;
 SELECT text FROM Twitter WHERE text CONTAINS 'Wind' and text CONTAINS '°F';
 SELECT text FROM Twitter WHERE text CONTAINS 'Wind' AND (text contains '°F' OR text CONTAINS '°C');
 SELECT text, temperatureF(text) as temperature FROM Twitter WHERE text CONTAINS 'Wind' AND (text contains '°F' OR text CONTAINS '°C');
@@ -21,7 +23,7 @@ test different AS
 SELECT text AS moo, text AS moo2 FROM Twitter WHERE text CONTAINS 'and';
 
 test group by
-SELECT location, COUNT(text) AS tweets FROM TWITTER_SAMPLE GROUP BY location WINDOW 10 seconds;
+SELECT location, COUNT(text) AS tweets FROM TWITTER_SAMPLE GROUP BY location WINDOW 120 seconds;
 
 
 SELECT AVG(Temperature(status)) AS temp, location FROM twitter where status contains 'degF' GROUP BY location WINDOW 300s;
