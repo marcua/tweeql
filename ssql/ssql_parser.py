@@ -32,7 +32,7 @@ def gen_parser():
     in_ = Keyword(QueryTokens.IN, caseless=True).setParseAction(upcaseTokens)
 
     E = CaselessLiteral("E")
-    binop = oneOf("= != < > >= <= eq ne lt le gt ge %s" % (QueryTokens.CONTAINS), caseless=True).setParseAction(upcaseTokens)
+    binop = oneOf("= != < > >= <= == eq ne lt le gt ge %s" % (QueryTokens.CONTAINS), caseless=True).setParseAction(upcaseTokens)
     arithSign = Word("+-",exact=1)
     realNum = Combine( Optional(arithSign) + ( Word( nums ) + "." + Optional( Word(nums) )  |
                 ( "." + Word(nums) ) ) + 

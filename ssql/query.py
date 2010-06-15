@@ -26,6 +26,7 @@ class QueryTokens:
     MIN = "MIN"
     MAX = "MAX"
     EQUALS = "="
+    DOUBLE_EQUALS = "=="
     EXCLAIM_EQUALS = "!="
     NULL = "NULL"
     EMPTY_STRING = ""
