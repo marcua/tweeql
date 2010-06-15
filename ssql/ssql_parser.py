@@ -14,6 +14,7 @@ def gen_parser():
     groupByToken   = Keyword(QueryTokens.GROUPBY, caseless=True)
     windowToken   = Keyword(QueryTokens.WINDOW, caseless=True)
     asToken = Keyword(QueryTokens.AS, caseless=True).setParseAction(upcaseTokens)
+    nullToken = Keyword(QueryTokens.NULL, caseless=False).setParseAction(replace(QueryTokens.NULL_TOKEN))
 
     ident          = Word( alphas, alphanums + "_$" ).setName("identifier")
     columnName     = delimitedList( ident, ".", combine=True )
@@ -39,7 +40,7 @@ def gen_parser():
     intNum = Combine( Optional(arithSign) + Word( nums ) + 
             Optional( E + Optional("+") + Word(nums) ) )
 
-    columnRval = realNum | intNum | columnExpression | quotedString.setParseAction(removeQuotes)
+    columnRval = realNum | intNum | nullToken | columnExpression | quotedString.setParseAction(removeQuotes)
     whereCondition = Group(
             ( columnExpression + binop + columnRval ).setParseAction(label(QueryTokens.WHERE_CONDITION)) |
             ( columnExpression + in_ + "(" + delimitedList( columnRval ) + ")" ).setParseAction(label(QueryTokens.WHERE_CONDITION)) |
@@ -88,6 +89,14 @@ def label(l):
         newlist = [l]
         newlist.extend(tokens)
         return newlist
+    return action
+
+def replace(l):
+    """
+        Returns a parseaction which replaces the tokens with the token l
+    """
+    def action(string, loc, tokens):
+        return [l]
     return action
 
 def runtests():

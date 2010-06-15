@@ -94,13 +94,21 @@ class QueryBuilder:
     def __parse_operator(self, clause, where_fields):
         if len(clause) == 3 and clause[1] == QueryTokens.CONTAINS:
             alias = self.__where_field(clause[0], where_fields)
-            return operators.Contains(alias, clause[2])
+            return operators.Contains(alias, self.__parse_rval(clause[2], allow_null=False))
         elif len(clause) == 3 and clause[1] == QueryTokens.EQUALS:
             alias = self.__where_field(clause[0], where_fields)
-            return operators.Equals(alias, clause[2])
+            return operators.Equals(alias, self.__parse_rval(clause[2], allow_null=True))
         elif len(clause) == 3 and clause[1] == QueryTokens.EXCLAIM_EQUALS:
             alias = self.__where_field(clause[0], where_fields)
-            return operators.Not(operators.Equals(alias, clause[2]))
+            return operators.Not(operators.Equals(alias, self.__parse_rval(clause[2], allow_null=True)))
+    def __parse_rval(self, val, allow_null):
+        if val == QueryTokens.NULL_TOKEN:
+            if allow_null:
+                return None
+            else:
+                raise QueryException("NULL appears in clause where it should not.")
+        else:
+            return val
     def __where_field(self, field, where_fields):
         (field_descriptors, verify) = self.__parse_field(field, self.twitter_td, False, False)
         alias = field_descriptors[0].alias

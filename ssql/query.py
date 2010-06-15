@@ -29,4 +29,5 @@ class QueryTokens:
     EXCLAIM_EQUALS = "!="
     NULL = "NULL"
     EMPTY_STRING = ""
+    NULL_TOKEN = "$$$NULL_TOKEN$$$"
     WHERE_CONDITION = "$$$WHERE_CONDITION$$$"

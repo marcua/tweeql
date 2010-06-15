@@ -206,8 +206,6 @@ class Equals(QueryOperator):
     def __init__(self, field_alias, term):
         QueryOperator.__init__(self)
         self.alias = field_alias
-        if term == QueryTokens.NULL:
-            term = None
         self.term = term
     def filter(self, updates, return_passes, return_fails):
         passes = [] if return_passes else None
