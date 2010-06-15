@@ -16,9 +16,7 @@ def main():
 
 def process_command(runner, cmd):
     try:
-        runner.run_query(cmd)
-        while True:
-            sleep(1000)
+        runner.run_query(cmd, False)
     except KeyboardInterrupt:
         runner.stop_query()
 

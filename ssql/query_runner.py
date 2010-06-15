@@ -27,7 +27,7 @@ class QueryRunner(StreamListener):
                              retry_count = 20, # try reconnecting 20 times
                              retry_time = 10.0, # wait 10s if no HTTP 200
                              snooze_time = 1.0) # wait 1s if timeout in 600s
-    def run_built_query(self, query_built):
+    def run_built_query(self, query_built, async):
         self.query = query_built
         self.status_handler.set_tuple_descriptor(self.query.get_tuple_descriptor())
         if self.query.source == StatusSource.TWITTER_FILTER:
@@ -36,15 +36,15 @@ class QueryRunner(StreamListener):
                 (follow_ids, track_words) = self.query.query_tree.filter_params()
                 if (follow_ids == None) and (track_words == [None]):
                     raise no_filter_exception
-                self.stream.filter(follow_ids, track_words, True)
+                self.stream.filter(follow_ids, track_words, async)
             except NotImplementedError:
                 raise no_filter_exception
         elif self.query.source == StatusSource.TWITTER_SAMPLE:
-            self.stream.sample(None, True)
-    def run_query(self, query_str):
+            self.stream.sample(None, async)
+    def run_query(self, query_str, async):
         query_str = unicode(query_str, 'utf-8')
         query_built = self.query_builder.build(query_str)
-        self.run_built_query(query_built)
+        self.run_built_query(query_built, async)
     def stop_query(self):
         self.stream.disconnect()
         self.flush_statuses()
