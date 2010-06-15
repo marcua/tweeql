@@ -27,6 +27,8 @@ class QueryOperator(object):
         raise NotImplementedError()
     def can_query_stream(self):
         return False
+    def get_tuple_descriptor(self):
+        return self.tuple_descriptor
 
 class AllowAll(QueryOperator):
     """

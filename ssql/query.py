@@ -2,6 +2,8 @@ class Query():
     def __init__(self, query_tree, source):
         self.query_tree = query_tree
         self.source = source
+    def get_tuple_descriptor(self):
+        return self.query_tree.get_tuple_descriptor()
 
 class QueryTokens:
     SELECT = "SELECT"

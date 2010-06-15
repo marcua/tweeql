@@ -28,6 +28,10 @@ class Tuple():
             raise QueryException("Attribute not defined: %s" % (attr))
         setattr(self, attr, result)
         return result
+    def as_iterable_visible_pairs(self):
+        for alias in self.__tuple_descriptor.aliases:
+            if self.__tuple_descriptor.get_descriptor(alias).visible:
+                yield (alias, getattr(self, alias))
     def generate_from_descriptor(self, tuple_descriptor):
         """
             Builds a new tuple from this one based on the tuple_descriptor that
