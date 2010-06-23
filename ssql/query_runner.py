@@ -1,7 +1,10 @@
 from getpass import getpass
+from ssql.exceptions import QueryException
+from ssql.exceptions import DbException
 from ssql.operators import StatusSource
 from ssql.query_builder import gen_query_builder
 from ssql.tuple_descriptor import Tuple
+from sqlalchemy import create_engine, Table, Column, Integer, String, MetaData
 from threading import RLock
 from threading import Thread
 from tweepy import StreamListener
@@ -24,17 +27,24 @@ class QueryRunner(StreamListener):
                              retry_count = 20, # try reconnecting 20 times
                              retry_time = 10.0, # wait 10s if no HTTP 200
                              snooze_time = 1.0) # wait 1s if timeout in 600s
-    def run_built_query(self, query_built):
+    def run_built_query(self, query_built, async):
         self.query = query_built
+        self.status_handler.set_tuple_descriptor(self.query.get_tuple_descriptor())
         if self.query.source == StatusSource.TWITTER_FILTER:
-            (follow_ids, track_words) = self.query.query_tree.filter_params()
-            self.stream.filter(follow_ids, track_words, True)
+            no_filter_exception = QueryException("You haven't specified any filters that can query Twitter.  Perhaps you want to query TWITTER_SAMPLE?")
+            try:
+                (follow_ids, track_words) = self.query.query_tree.filter_params()
+                if (follow_ids == None) and (track_words == [None]):
+                    raise no_filter_exception
+                self.stream.filter(follow_ids, track_words, async)
+            except NotImplementedError:
+                raise no_filter_exception
         elif self.query.source == StatusSource.TWITTER_SAMPLE:
-            self.stream.sample(None, True)
-    def run_query(self, query_str):
+            self.stream.sample(None, async)
+    def run_query(self, query_str, async):
         query_str = unicode(query_str, 'utf-8')
         query_built = self.query_builder.build(query_str)
-        self.run_built_query(query_built)
+        self.run_built_query(query_built, async)
     def stop_query(self):
         self.stream.disconnect()
         self.flush_statuses()
@@ -43,8 +53,9 @@ class QueryRunner(StreamListener):
         handler.handle_statuses(passes)
     def flush_statuses(self):
         self.status_lock.acquire()
-        filter_func = lambda: self.filter_statuses(self.statuses, self.query, self.status_handler)
-        Thread(target = filter_func).start()
+        filter_func = lambda s=self.statuses, q=self.query, h=self.status_handler: self.filter_statuses(s,q,h)
+        t = Thread(target = filter_func)
+        t.start()
         self.statuses = []
         self.status_lock.release()
 
@@ -53,10 +64,9 @@ class QueryRunner(StreamListener):
         self.status_lock.acquire()
         t = Tuple()
         t.set_tuple_descriptor(None)
-        t.set_data(None)
         t.set_data(status.__dict__)
         self.statuses.append(t)
-        if len(self.statuses) > self.batch_size:
+        if len(self.statuses) >= self.batch_size:
             self.flush_statuses()
         self.status_lock.release()
     def on_error(self, status_code):
@@ -65,12 +75,53 @@ class QueryRunner(StreamListener):
     def on_timeout(self):
         print 'Snoozing Zzzzzz'
 
-class PrintStatusHandler(object):
+class StatusHandler(object):
     def handle_statuses(self, statuses):
+        raise NotImplementedError()
+    def set_tuple_descriptor(self, descriptor):
+        self.tuple_descriptor = descriptor
+
+class PrintStatusHandler(StatusHandler):
+    def __init__(self, delimiter = u"|"):
+        self.delimiter = delimiter
+
+    def handle_statuses(self, statuses):
+        td = self.tuple_descriptor
         for status in statuses:
-            td = status.get_tuple_descriptor()
-            vals = []
-            for alias in td.aliases:
-                if td.get_descriptor(alias).visible:
-                    vals.append(unicode(getattr(status, alias)))
-            print u",".join(vals)
+            vals = (unicode(val) for (alias, val) in status.as_iterable_visible_pairs())
+            print self.delimiter.join(vals)
+
+class DbInsertStatusHandler(StatusHandler):
+    def __init__(self, tablename, dburi):
+        self.dburi = dburi
+        self.tablename = tablename
+
+    def set_tuple_descriptor(self, descriptor):
+        StatusHandler.set_tuple_descriptor(self, descriptor)
+        self.engine = create_engine(self.dburi, echo=False)
+        metadata = MetaData()
+        columns = [Column(alias, String) for alias in descriptor.aliases]
+        columns.insert(0, Column('__id', Integer, primary_key=True))
+        self.table = Table(self.tablename, metadata, *columns)
+        metadata.create_all(bind=self.engine)
+        test = metadata.tables[self.tablename]
+        self.verify_table()
+    
+    def verify_table(self):
+        """
+            Makes sure the table's schema is not different from the one in the database.
+            This might happen if you try to load a query into a table which already
+            exists and has a different schema.
+        """
+        metadata = MetaData()
+        metadata.reflect(bind = self.engine)
+        mine = str(self.table.columns)
+        verified = str(metadata.tables[self.tablename].columns)
+        if mine != verified:
+            raise DbException("Table '%s' in the database has schema %s whereas the query's schema is %s" % (self.tablename, verified, mine)) 
+ 
+    def handle_statuses(self, statuses):
+        conn = self.engine.connect()
+        dicts = [dict(status.as_iterable_visible_pairs()) for status in statuses]
+        conn.execute(self.table.insert(), dicts)
+        conn.close()

@@ -6,3 +6,6 @@ class SSQLException(Exception):
 
 class QueryException(SSQLException):
     pass
+
+class DbException(SSQLException):
+    pass

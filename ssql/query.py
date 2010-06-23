@@ -2,12 +2,15 @@ class Query():
     def __init__(self, query_tree, source):
         self.query_tree = query_tree
         self.source = source
+    def get_tuple_descriptor(self):
+        return self.query_tree.get_tuple_descriptor()
 
 class QueryTokens:
     SELECT = "SELECT"
     FROM = "FROM"
     WHERE = "WHERE"
     GROUPBY = "GROUP BY"
+    WINDOW = "WINDOW"
     TWITTER = "TWITTER"
     TWITTER_SAMPLE = "TWITTER_SAMPLE"
     LPAREN = "("
@@ -25,5 +28,6 @@ class QueryTokens:
     EQUALS = "="
     EXCLAIM_EQUALS = "!="
     NULL = "NULL"
-    TEXT = "text" # TODO: this is a field name.  should it be in QueryTokens?
+    EMPTY_STRING = ""
+    NULL_TOKEN = "$$$NULL_TOKEN$$$"
     WHERE_CONDITION = "$$$WHERE_CONDITION$$$"

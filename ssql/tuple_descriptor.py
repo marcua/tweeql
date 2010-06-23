@@ -26,24 +26,53 @@ class Tuple():
             result = self.__data[field_descriptor.underlying_fields[0]]
         else:
             raise QueryException("Attribute not defined: %s" % (attr))
-#        if result == None:
-#            result = "NULL"
         setattr(self, attr, result)
         return result
+    def as_iterable_visible_pairs(self):
+        for alias in self.__tuple_descriptor.aliases:
+            if self.__tuple_descriptor.get_descriptor(alias).visible:
+                yield (alias, getattr(self, alias))
     def generate_from_descriptor(self, tuple_descriptor):
         """
             Builds a new tuple from this one based on the tuple_descriptor that
             is passed in.
         """
-        d = {}
-        for alias in tuple_descriptor.aliases:
-            fields = self.tuple_descriptor.get_descriptor(alias).underlying_fields
-            for field in fields:
-                d[field] = getattr(self, field)
         t = Tuple()
-        t.set_tuple_descriptor(tuple_descriptor)
+        d = {}
         t.set_data(d)
+        for alias in tuple_descriptor.aliases:
+            fields = self.__tuple_descriptor.get_descriptor(alias).underlying_fields
+            for field in fields:
+                setattr(t, field, getattr(self, field))
+            setattr(t, alias, getattr(self, alias))
+        t.set_tuple_descriptor(tuple_descriptor)
         return t
+    def __hash__(self):
+        if not self:
+            return 0
+        value = -1
+        for alias in self.__tuple_descriptor.aliases:
+            if self.__tuple_descriptor.get_descriptor(alias).visible:
+                fieldval = hash(getattr(self, alias))
+                if value == -1:
+                    value = fieldval << 7
+                else:
+                    value = self.c_mul(1000003, value) ^ fieldval
+        return value
+    def __eq__(self, other):
+        if isinstance(other, Tuple):
+            if self.__tuple_descriptor is other.__tuple_descriptor: # strict object equality
+                for alias in self.__tuple_descriptor.aliases:
+                    if self.__tuple_descriptor.get_descriptor(alias).visible:
+                        if getattr(self, alias) != getattr(other, alias):
+                            return False
+                return True
+            else:
+                return False
+        else:
+            return NotImplemented
+    def c_mul(self, a, b):
+        return eval(hex((long(a) * b) & 0xFFFFFFFFL)[:-1])
 
 class TupleDescriptor():
     def __init__(self, field_descriptors = []):
@@ -60,14 +89,19 @@ class TupleDescriptor():
             self.add_descriptor(descriptor)
     def add_descriptor(self, descriptor):
         visible = descriptor.visible
+        copy_descriptor = True
         if descriptor.alias in self.descriptors:
             if (self.descriptors[descriptor.alias].field_type != FieldType.UNDEFINED) and \
+               (descriptor.field_type != FieldType.UNDEFINED) and \
                (self.descriptors[descriptor.alias] != descriptor):
                 raise QueryException("The alias '%s' appears more than once in your query" % (descriptor.alias))
             # if one of the descriptors is visible, mark the stored one as
             # visible.
             visible = self.descriptors[descriptor.alias].visible or descriptor.visible
+            if descriptor.field_type == FieldType.UNDEFINED:
+                copy_descriptor = False
         else:
             self.aliases.append(descriptor.alias)
-        self.descriptors[descriptor.alias] = descriptor
+        if copy_descriptor:
+            self.descriptors[descriptor.alias] = descriptor #copy.deepcopy(descriptor)
         self.descriptors[descriptor.alias].visible = visible
