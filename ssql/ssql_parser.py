@@ -18,9 +18,12 @@ def gen_parser():
 
     ident          = Word( alphas, alphanums + "_$" ).setName("identifier")
     columnName     = delimitedList( ident, ".", combine=True )
+    columnName.setParseAction(label(QueryTokens.COLUMN_NAME))
+    aliasName     = delimitedList( ident, ".", combine=True )
     columnExpression = Forward()
-    columnFunction = Word(alphas, alphanums) + "(" + delimitedList(columnExpression) + ")" 
-    columnExpression << Group ( (columnFunction | columnName) + Optional( asToken + columnName ) )
+    columnFunction = Word(alphas, alphanums) + "(" + Optional(delimitedList(columnExpression)) + ")" 
+    columnFunction.setParseAction(label(QueryTokens.FUNCTION_OR_AGGREGATE))
+    columnExpression << Group ( (columnFunction | columnName) + Optional( asToken + aliasName ) )
     columnExpressionList = Group( delimitedList( columnExpression ) )
     tableName      = delimitedList( ident, ".", combine=True ).setParseAction(upcaseTokens)
     tableNameList  = Group( delimitedList( tableName ) )
