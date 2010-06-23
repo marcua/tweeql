@@ -8,8 +8,8 @@ from geopy import geocoders
 import re
 
 class Temperature():
-    fahr = re.compile(ur"(\-?\d+(\.\d+)?)\s*\u00B0?F", re.UNICODE)
-    celcius = re.compile(ur"(\-?\d+(\.\d+)?)\s*\u00B0?C", re.UNICODE)
+    fahr = re.compile(ur"(\-?\d+([.,]\d+)?)\s*\u00B0?F", re.UNICODE)
+    celcius = re.compile(ur"(\-?\d+([.,]\d+)?)\s*\u00B0?C", re.UNICODE)
     return_type = ReturnType.FLOAT
 
     @staticmethod
@@ -21,11 +21,13 @@ class Temperature():
         fahr_search = Temperature.fahr.search(status)
         temperature = None
         if fahr_search != None:
-            temperature = float(fahr_search.group(1))
+            temperature = fahr_search.group(1).replace(",", ".")
+            temperature = float(temperature)
         else:
             celcius_search = Temperature.celcius.search(status)
             if celcius_search != None:
-                temperature = float(celcius_search.group(1))
+                temperature = celcius_search.group(1).replace(",", ".")
+                temperature = float(temperature)
                 temperature = ((9.0/5) * temperature) + 32
         return temperature
 
