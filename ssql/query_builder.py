@@ -5,6 +5,7 @@ from ssql.operators import StatusSource
 from ssql.exceptions import QueryException
 from ssql.field_descriptor import FieldDescriptor
 from ssql.field_descriptor import FieldType
+from ssql.field_descriptor import ReturnType
 from ssql.function_registry import FunctionRegistry
 from ssql.query import Query
 from ssql.query import QueryTokens
@@ -199,6 +200,7 @@ class QueryBuilder:
         return_type = None
         underlying_fields = None
         aggregate_factory = None
+        literal_value = None
         function = None
         fields_to_verify = []
         parsed_fds = []
@@ -209,7 +211,13 @@ class QueryBuilder:
         if (len(field) >= 4) and (field[-2] == QueryTokens.AS):
             alias = field[-1]
             field = field[:-2]
-        if field[0] == QueryTokens.COLUMN_NAME: # field or alias
+        if field[0] == QueryTokens.LITERAL:
+            alias = self.unnamed_operator_name()
+            underlying_fields = []
+            field_type = FieldType.LITERAL
+            return_type = ReturnType.STRING
+            literal_value = field[1]
+        elif field[0] == QueryTokens.COLUMN_NAME: # field or alias
             if alias == None:
                 alias = field[1]
             field_descriptor = tuple_descriptor.get_descriptor(field[1])
@@ -231,8 +239,7 @@ class QueryBuilder:
                 if alias_on_complex_types:
                     raise QueryException("Must specify alias (AS clause) for '%s'" % (repr(field)))
                 else:
-                    self.unnamed_operator_counter += 1
-                    alias = "operand%d" % (self.unnamed_operator_counter)
+                    alias = self.unnamed_operator_name()
             underlying_field_list = field[2:]
             underlying_fields = []
             for underlying in underlying_field_list:
@@ -256,7 +263,7 @@ class QueryBuilder:
                     raise QueryException("'%s' is neither an aggregate or a registered function" % (field[1]))
         else:
             raise QueryException("Empty field clause found: %s" % ("".join(field_backup)))
-        fd = FieldDescriptor(alias, underlying_fields, field_type, return_type, aggregate_factory, function)
+        fd = FieldDescriptor(alias, underlying_fields, field_type, return_type, aggregate_factory, function, literal_value)
         fd.visible = make_visible
         parsed_fds.insert(0, fd)
         return (parsed_fds, fields_to_verify)
@@ -282,3 +289,6 @@ class QueryBuilder:
             raise QueryException("Field '%s' is neither a builtin field nor an alias" % (field))
         else:
             return field_descriptor
+    def unnamed_operator_name(self):
+        self.unnamed_operator_counter += 1
+        return "operand%d" % (self.unnamed_operator_counter)

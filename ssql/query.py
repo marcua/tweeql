@@ -30,6 +30,7 @@ class QueryTokens:
     EXCLAIM_EQUALS = "!="
     NULL = "NULL"
     EMPTY_STRING = ""
+    LITERAL = "$$$LITERAL$$$"
     NULL_TOKEN = "$$$NULL_TOKEN$$$"
     WHERE_CONDITION = "$$$WHERE_CONDITION$$$"
     FUNCTION_OR_AGGREGATE = "$$$FUNCTION_OR_AGGREGATE$$$"

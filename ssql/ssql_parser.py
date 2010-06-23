@@ -20,8 +20,11 @@ def gen_parser():
     columnName     = delimitedList( ident, ".", combine=True )
     columnName.setParseAction(label(QueryTokens.COLUMN_NAME))
     aliasName     = delimitedList( ident, ".", combine=True )
+    literalArgument = Forward()
+    literalArgument << quotedString
+    literalArgument.setParseAction(label(QueryTokens.LITERAL))
     columnExpression = Forward()
-    columnFunction = Word(alphas, alphanums) + "(" + Optional(delimitedList(columnExpression)) + ")" 
+    columnFunction = Word(alphas, alphanums) + "(" + Optional(delimitedList(Group ( literalArgument ) | columnExpression)) + ")" 
     columnFunction.setParseAction(label(QueryTokens.FUNCTION_OR_AGGREGATE))
     columnExpression << Group ( (columnFunction | columnName) + Optional( asToken + aliasName ) )
     columnExpressionList = Group( delimitedList( columnExpression ) )
