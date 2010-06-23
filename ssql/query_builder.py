@@ -95,7 +95,7 @@ class QueryBuilder:
         if len(clause) == 3 and clause[1] == QueryTokens.CONTAINS:
             alias = self.__where_field(clause[0], where_fields)
             return operators.Contains(alias, self.__parse_rval(clause[2], allow_null=False))
-        elif len(clause) == 3 and clause[1] == QueryTokens.EQUALS:
+        elif len(clause) == 3 and ((clause[1] == QueryTokens.EQUALS) or (clause[1] == QueryTokens.DOUBLE_EQUALS)):
             alias = self.__where_field(clause[0], where_fields)
             return operators.Equals(alias, self.__parse_rval(clause[2], allow_null=True))
         elif len(clause) == 3 and clause[1] == QueryTokens.EXCLAIM_EQUALS:
@@ -114,7 +114,7 @@ class QueryBuilder:
         alias = field_descriptors[0].alias
         # name the field whatever alias __parse_field gave it so it can be
         # passed to __parse_field in the future and have a consistent name
-        if not ((len(field) >= 3) and (field[-2] == QueryTokens.AS)):
+        if not ((len(field) >= 4) and (field[-2] == QueryTokens.AS)):
             field.append(QueryTokens.AS)
             field.append(alias)
         where_fields.append(field)
@@ -205,34 +205,34 @@ class QueryBuilder:
         self.__clean_list(field)
         
         # parse aliases if they exist
-        if (len(field) >= 3) and (field[-2] == QueryTokens.AS):
+        if (len(field) >= 4) and (field[-2] == QueryTokens.AS):
             alias = field[-1]
             field = field[:-2]
 
-        if len(field) == 1: # field or alias
+        if field[0] == QueryTokens.COLUMN_NAME: # field or alias
             if alias == None:
-                alias = field[0]
-            field_descriptor = tuple_descriptor.get_descriptor(field[0])
+                alias = field[1]
+            field_descriptor = tuple_descriptor.get_descriptor(field[1])
             if field_descriptor == None: # underlying field not yet defined.  mark to check later
                 field_type = FieldType.UNDEFINED
-                underlying_fields = [field[0]]
+                underlying_fields = [field[1]]
                 # check alias and underlying once this process is done to
                 # find yet-undefined fields
-                fields_to_verify.append(field[0])
+                fields_to_verify.append(field[1])
                 fields_to_verify.append(alias)
             else: # field found, copy information
                 field_type = field_descriptor.field_type
                 underlying_fields = field_descriptor.underlying_fields
                 aggregate_factory = field_descriptor.aggregate_factory
                 function = field_descriptor.function
-        elif len(field) > 1: # function or aggregate  
+        elif field[0] == QueryTokens.FUNCTION_OR_AGGREGATE: # function or aggregate  
             if alias == None:
                 if alias_on_complex_types:
                     raise QueryException("Must specify alias (AS clause) for '%s'" % (repr(field)))
                 else:
                     self.unnamed_operator_counter += 1
                     alias = "operand%d" % (self.unnamed_operator_counter)
-            underlying_field_list = field[1:]
+            underlying_field_list = field[2:]
             underlying_fields = []
             for underlying in underlying_field_list:
                 (parsed_fd_list, parsed_verify) = self.__parse_field(underlying, tuple_descriptor, False, False)
@@ -241,11 +241,11 @@ class QueryBuilder:
                 fields_to_verify.extend(parsed_verify)
                 parsed_fds.extend(parsed_fd_list)
                 underlying_fields.append(parsed_fd_list[0].alias)
-            aggregate_factory = get_aggregate_factory(field[0])
+            aggregate_factory = get_aggregate_factory(field[1])
             if aggregate_factory != None: # found an aggregate function
                 field_type = FieldType.AGGREGATE
             else:
-                function = self.function_registry.get_function(field[0])
+                function = self.function_registry.get_function(field[1])
                 if function != None:
                     field_type = FieldType.FUNCTION
                 else:
