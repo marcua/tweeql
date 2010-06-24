@@ -29,7 +29,7 @@ class Tuple():
             result = self.__data[field_descriptor.underlying_fields[0]]
         else:
             raise QueryException("Attribute not defined: %s" % (attr))
-        if (field_descriptor.return_type == ReturnType.STRING) and (type(result) == str):
+        if (field_descriptor.return_type == ReturnType.STRING) and isinstance(result, str):
             result = unicode(result)
         setattr(self, attr, result)
         return result
