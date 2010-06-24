@@ -15,7 +15,7 @@ SELECT text, temperatureF(text) as temperature, location FROM Twitter WHERE text
 
 test lat/long extractor for location
 
-SELECT text, temperatureF(text) as temperature, location, created_at, tweetLatLng("lat") as lat, tweetLatLng("lng") as lng FROM Twitter WHERE text CONTAINS 'Wind' AND temperature != NULL;
+SELECT text, temperatureF(text) as temperature, created_at, location, tweetLatLng("lat") as latitude, tweetLatLng("lng") as longitude FROM Twitter WHERE text CONTAINS 'Wind' AND temperature != NULL;
 
 
 test NULL---should return only null temperatures

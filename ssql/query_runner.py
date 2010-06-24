@@ -101,25 +101,31 @@ class DbInsertStatusHandler(StatusHandler):
         StatusHandler.set_tuple_descriptor(self, descriptor)
         self.engine = create_engine(self.dburi, echo=False)
         metadata = MetaData()
-        columns = [Column(alias, self.db_type(alias, descriptor)) for alias in descriptor.aliases]
+        columns = []
+        for alias in descriptor.aliases:
+            desc = descriptor.get_descriptor(alias)
+            if desc.visible:
+                columns.append(self.db_col(alias, descriptor))
         columns.insert(0, Column('__id', Integer, primary_key=True))
         self.table = Table(self.tablename, metadata, *columns)
         metadata.create_all(bind=self.engine)
         test = metadata.tables[self.tablename]
         self.verify_table()
    
-    def db_type(self, alias, descriptor):
-        return_type = descriptor[alias].return_type
+    def db_col(self, alias, descriptor):
+        return_type = descriptor.get_descriptor(alias).return_type
+        type_val = None
         if return_type == ReturnType.INTEGER:
-            return Integer
+            type_val = Integer
         elif return_type == ReturnType.FLOAT:
-            return Float
+            type_val = Float
         elif return_type == ReturnType.STRING:
-            return Unicode
+            type_val = Unicode
         elif return_type == ReturnType.DATETIME:
-            return DateTime
+            type_val = DateTime
         else:
             raise DbException("Unknown field return type: %s" % (return_type))
+        return Column(alias, type_val)
 
     def verify_table(self):
         """
