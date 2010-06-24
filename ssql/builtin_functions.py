@@ -4,8 +4,10 @@ from ssql.field_descriptor import ReturnType
 from ssql.function_registry import FunctionInformation
 from ssql.function_registry import FunctionRegistry
 from geopy import geocoders
+from urllib2 import URLError
 
 import re
+import sys
 
 class Temperature():
     fahr = re.compile(ur"(\-?\d+([.,]\d+)?)\s*\u00B0?F", re.UNICODE)
@@ -48,10 +50,14 @@ class Location:
             if latlng == None:
                 loc = tuple_data["user"].location
                 if (loc != None) and (loc != ""):
-                    g = Location.gn.geocode(loc.encode('utf-8'), exactly_one=False)
-                    for place, (lat, lng) in g:
-                        latlng = (lat, lng)
-                        break 
+                    try:
+                        g = Location.gn.geocode(loc.encode('utf-8'), exactly_one=False)
+                        for place, (lat, lng) in g:
+                            latlng = (lat, lng)
+                            break
+                    except URLError:
+                        e = sys.exc_info()[1]
+                        print "Unable to connect to GeoNames: %s" % (e)
             tuple_data[Location.LATLNG] = latlng
         val = None
         if tuple_data[Location.LATLNG] != None:
