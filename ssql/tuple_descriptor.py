@@ -22,6 +22,8 @@ class Tuple():
             args = [getattr(self, field) for field in uf]
             args.insert(0, self.__data)
             result = func(*args)
+        elif field_descriptor.field_type == FieldType.LITERAL:
+            result = field_descriptor.literal_value
         elif field_descriptor.underlying_fields[0] in self.__data:
             result = self.__data[field_descriptor.underlying_fields[0]]
         else:

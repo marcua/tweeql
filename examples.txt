@@ -14,7 +14,9 @@ test NULL---should return only filled temperatures
 SELECT text, temperatureF(text) as temperature, location FROM Twitter WHERE text CONTAINS 'Wind' AND temperature != NULL;
 
 test lat/long extractor for location
-SELECT text, temperatureF(text) as temperature, created_at, location, tweetLatLng() as loc FROM Twitter WHERE text CONTAINS 'Wind' AND temperature != NULL;
+
+SELECT text, temperatureF(text) as temperature, tweetLatLng("lat") as lat, tweetLatLng("lng") as lng FROM Twitter WHERE text CONTAINS 'Wind' AND temperature != NULL;
+
 
 test NULL---should return only null temperatures
 SELECT text, temperatureF(text) as temperature, location FROM Twitter WHERE text CONTAINS 'Wind' AND temperature = NULL

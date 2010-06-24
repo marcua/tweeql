@@ -1,10 +1,11 @@
 from getpass import getpass
 from ssql.exceptions import QueryException
 from ssql.exceptions import DbException
+from ssql.field_descriptor import ReturnType
 from ssql.operators import StatusSource
 from ssql.query_builder import gen_query_builder
 from ssql.tuple_descriptor import Tuple
-from sqlalchemy import create_engine, Table, Column, Integer, String, MetaData
+from sqlalchemy import create_engine, Table, Column, Integer, Unicode, Float, DateTime, MetaData
 from threading import RLock
 from threading import Thread
 from tweepy import StreamListener
@@ -100,13 +101,26 @@ class DbInsertStatusHandler(StatusHandler):
         StatusHandler.set_tuple_descriptor(self, descriptor)
         self.engine = create_engine(self.dburi, echo=False)
         metadata = MetaData()
-        columns = [Column(alias, String) for alias in descriptor.aliases]
+        columns = [Column(alias, self.db_type(alias, descriptor)) for alias in descriptor.aliases]
         columns.insert(0, Column('__id', Integer, primary_key=True))
         self.table = Table(self.tablename, metadata, *columns)
         metadata.create_all(bind=self.engine)
         test = metadata.tables[self.tablename]
         self.verify_table()
-    
+   
+    def db_type(self, alias, descriptor):
+        return_type = descriptor[alias].return_type
+        if return_type == ReturnType.INTEGER:
+            return Integer
+        elif return_type == ReturnType.FLOAT:
+            return Float
+        elif return_type == ReturnType.STRING:
+            return Unicode
+        elif return_type == ReturnType.DATETIME:
+            return DateTime
+        else:
+            raise DbException("Unknown field return type: %s" % (return_type))
+
     def verify_table(self):
         """
             Makes sure the table's schema is not different from the one in the database.
