@@ -1,0 +1,19 @@
+<h3>{{poll.question}}</h3>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<form action="/polls/{{ poll.id }}/editpole/" method="post">
+	{% csrf_token %}
+	Enter the choice here:
+    <input type="text" name="text1"/>
+  	<br/>
+	<input type="submit" value="Enter"/>
+</form>
+
+<form action="/polls/{{ poll.id }}/editpole1/" method="post">
+{% csrf_token %}
+Edit the poll:
+<input type="text" name="text2"/>
+<br/>
+<input type="submit" value="Enter"/>
+</form>

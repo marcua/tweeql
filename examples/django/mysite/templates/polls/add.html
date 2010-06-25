@@ -1,0 +1,12 @@
+<h3>Add a new poll</h3>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<form action="/polls/addpole/" method="post">
+	{% csrf_token %}
+	Enter the poll here:
+    <input type="text" name="text"/>
+  	<br />
+	<input type="submit" value="Enter" />
+
+</form>
