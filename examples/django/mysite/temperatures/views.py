@@ -58,7 +58,10 @@ def generate_placemarks_kml(temperature_table, db_conn):
                         temperature_table.c.temperature > 0.0,
                         temperature_table.c.temperature < 120.0, 
                         temperature_table.c.created_at > yesterday)
-    data_query = select([temperature_table.c.latitude,temperature_table.c.longitude,temperature_table.c.temperature], where_clause)
+    data_query = select([func.round(temperature_table.c.latitude).label('latitude'),
+                         func.round(temperature_table.c.longitude).label('longitude'),
+                         func.avg(temperature_table.c.temperature).label('temperature')],where_clause).\
+                         group_by(func.round(temperature_table.c.latitude),func.round(temperature_table.c.latitude))
     maxT_query = select([func.max(temperature_table.c.temperature)], where_clause)
     minT_query = select([func.min(temperature_table.c.temperature)], where_clause)
 
