@@ -1,5 +1,36 @@
 <html>
 <head>
+
+<style type="text/css">
+body {
+    margin: 0;
+    margin-bottom: 0em;
+    padding: 0;
+    font-family: "Gill sans", sans-serif;
+    background-color: #fff;
+    color: #000;
+}
+div#hd {
+    text-align: center;
+    border-bottom: 2px solid black;
+}
+div#hd h1 {
+    margin-bottom: 1;
+    font-size: 1.0em;
+}
+
+div#bd {
+    position: relative;
+}
+div#map_canvas {
+    width: 100%;
+    height: 450px;
+}
+
+</style>
+	
+		
+<title>Average temperatures extracted from twitter displayed on world map.</title>
 <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
 <title>Google Maps JavaScript API v3 Example: KmlLayer KML</title>
@@ -26,6 +57,10 @@ function initialize() {
 
 function codeAddress() {
 	
+	var contentString = document.getElementById("address").value;
+	var infowindow = new google.maps.InfoWindow({
+	    content: contentString
+	});
    var address = document.getElementById("address").value;
    if (geocoder) {
      geocoder.geocode( { 'address': address}, function(results, status) {
@@ -37,11 +72,19 @@ function codeAddress() {
               position: results[0].geometry.location,
 			  title:address,
          });
+
+		google.maps.event.addListener(marker, 'click', function() {
+		  infowindow.open(map,marker);
+		});
+		
+		
        } else {
          alert("Geocode was not successful for the following reason: " + status);
        }
      });
    }
+
+
 	return false;
  }
 
@@ -51,11 +94,24 @@ function codeAddress() {
 </head>
 <body style="margin:0px; padding:0px;" onload="initialize()">
 	
-<div id="map_canvas" style="width:90%; height:90%"></div>
-<form onsubmit="return codeAddress()">
-  <input id="address" type="textbox">
-  <input type="button" value="Search">
-</form>
+
+<div id="hd">
+
+    <h1>World Temperatures</h1>
+    <p>Average temperatures extracted from tweets.</p>
+    <form name="input" onsubmit="return codeAddress();">
+        <p>
+		  <input id="address" type="textbox">
+		  <input type="button" value="Search" >
+        </p>
+    </form>
+</div>
+
+<div id="bd">
+	<div id="map_canvas"</div>
+</div>	
+
+
 
 </body>
 </html>
