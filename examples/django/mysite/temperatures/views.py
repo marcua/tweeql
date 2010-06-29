@@ -61,7 +61,7 @@ def generate_placemarks_kml(temperature_table, db_conn):
     data_query = select([func.round(temperature_table.c.latitude).label('latitude'),
                          func.round(temperature_table.c.longitude).label('longitude'),
                          func.avg(temperature_table.c.temperature).label('temperature')],where_clause).\
-                         group_by(func.round(temperature_table.c.latitude),func.round(temperature_table.c.latitude))
+                         group_by(func.round(temperature_table.c.latitude),func.round(temperature_table.c.longitude))
     maxT_query = select([func.max(temperature_table.c.temperature)], where_clause)
     minT_query = select([func.min(temperature_table.c.temperature)], where_clause)
 
@@ -96,7 +96,7 @@ def lat_lng(row):
     lng = row["longitude"]
     n = int(lat/GRANULARITY)
     nlat_start = n * GRANULARITY
-    nlat_end = nlat_start + GRANULARITY
+    nlat_end = nlat_start - GRANULARITY
     nlg=int(lng/GRANULARITY)
     nlng_start = nlg * GRANULARITY
     nlng_end = nlng_start + GRANULARITY
