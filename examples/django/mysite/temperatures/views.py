@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import get_object_or_404, render_to_response
@@ -174,9 +175,8 @@ def generate_weather_kml():
     return "".join(kml_body)
 
 def display(request):
-    return HttpResponse(generate_weather_kml(),content_type="application\vnd.google-earth.kml+xml")
-    
-    
-
-    
-    
+    content = cache.get("content")
+    if content == None:
+        content = generate_weather_kml()
+        cache.set("content", content, 60)
+    return HttpResponse(content,content_type="application\vnd.google-earth.kml+xml")    
