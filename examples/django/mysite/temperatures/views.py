@@ -8,9 +8,13 @@ from sqlalchemy.sql import func
 import json
 
 # this is the database address that sqlalchemy uses to connect.
-DB_URI='sqlite:////Users/badar/Desktop/UROP/ssql/test.db'
+DB_URI='sqlite:////home/marcua/data/repos/decsoc/ssql/test.db'
+#DB_URI='sqlite:////Users/badar/Desktop/UROP/ssql/test.db'
 # this is the latitude/longitude grid size of squares displayed on map
 GRANULARITY=1.0
+# An alpha transparency value from 0-255 for the transparency level of the
+# squares on the map
+ALPHA = hex(200)[2:]
 
 def generate_style_kml():
     blue=255
@@ -18,7 +22,7 @@ def generate_style_kml():
     delta=5
     linewidth=0
     list_styles=[]
-    list_styles.append(generate_style('FFFF0000',0,linewidth))
+    list_styles.append(generate_style(ALPHA + 'FF0000',0,linewidth))
     for id in range(1,52):
         blue=blue-delta
         red=red+delta
@@ -33,7 +37,7 @@ def convert_to_hex(blue,red):
     r=hex(red)[2:]
     if red<=15:
         r='0'+r
-    return 'FF'+b+'00'+r
+    return ALPHA+b+'00'+r
 
 
 def generate_style(hexa,id,linewidth):
@@ -58,7 +62,14 @@ def generate_placemarks_kml(temperature_table, db_conn):
                         temperature_table.c.temperature > 0.0,
                         temperature_table.c.temperature < 120.0, 
                         temperature_table.c.created_at > yesterday)
-    data_query = select([temperature_table.c.latitude,temperature_table.c.longitude,temperature_table.c.temperature], where_clause)
+    #data_query = select([func.round(temperature_table.c.latitude).label('latitude'),
+    #                     func.round(temperature_table.c.longitude).label('longitude'),
+    #                     func.avg(temperature_table.c.temperature).label('temperature')],where_clause).\
+    #                     group_by(func.round(temperature_table.c.latitude),func.round(temperature_table.c.latitude))
+    data_query = select([temperature_table.c.latitude.label('latitude'),
+                         temperature_table.c.longitude.label('longitude'),
+                         func.avg(temperature_table.c.temperature).label('temperature')],where_clause).\
+                         group_by(temperature_table.c.latitude,temperature_table.c.latitude)
     maxT_query = select([func.max(temperature_table.c.temperature)], where_clause)
     minT_query = select([func.min(temperature_table.c.temperature)], where_clause)
 
