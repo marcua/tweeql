@@ -1,6 +1,7 @@
 import copy
 from field_descriptor import FieldDescriptor
 from field_descriptor import FieldType
+from field_descriptor import ReturnType
 from ssql.exceptions import QueryException
 
 class Tuple():
@@ -28,6 +29,8 @@ class Tuple():
             result = self.__data[field_descriptor.underlying_fields[0]]
         else:
             raise QueryException("Attribute not defined: %s" % (attr))
+        if (field_descriptor.return_type == ReturnType.STRING) and isinstance(result, str):
+            result = unicode(result)
         setattr(self, attr, result)
         return result
     def as_iterable_visible_pairs(self):

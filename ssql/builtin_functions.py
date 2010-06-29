@@ -4,12 +4,14 @@ from ssql.field_descriptor import ReturnType
 from ssql.function_registry import FunctionInformation
 from ssql.function_registry import FunctionRegistry
 from geopy import geocoders
+from urllib2 import URLError
 
 import re
+import sys
 
 class Temperature():
-    fahr = re.compile(ur"(\-?\d+([.,]\d+)?)\s*\u00B0?F", re.UNICODE)
-    celcius = re.compile(ur"(\-?\d+([.,]\d+)?)\s*\u00B0?C", re.UNICODE)
+    fahr = re.compile(ur"(^| )(\-?\d+([.,]\d+)?)\s*\u00B0?(F$|F |Fahr)", re.UNICODE)
+    celcius = re.compile(ur"(^| )(\-?\d+([.,]\d+)?)\s*\u00B0?(C$|C |Celsius)", re.UNICODE)
     return_type = ReturnType.FLOAT
 
     @staticmethod
@@ -21,12 +23,12 @@ class Temperature():
         fahr_search = Temperature.fahr.search(status)
         temperature = None
         if fahr_search != None:
-            temperature = fahr_search.group(1).replace(",", ".")
+            temperature = fahr_search.group(2).replace(",", ".")
             temperature = float(temperature)
         else:
             celcius_search = Temperature.celcius.search(status)
             if celcius_search != None:
-                temperature = celcius_search.group(1).replace(",", ".")
+                temperature = celcius_search.group(2).replace(",", ".")
                 temperature = float(temperature)
                 temperature = ((9.0/5) * temperature) + 32
         return temperature
@@ -48,10 +50,14 @@ class Location:
             if latlng == None:
                 loc = tuple_data["user"].location
                 if (loc != None) and (loc != ""):
-                    g = Location.gn.geocode(loc.encode('utf-8'), exactly_one=False)
-                    for place, (lat, lng) in g:
-                        latlng = (lat, lng)
-                        break 
+                    try:
+                        g = Location.gn.geocode(loc.encode('utf-8'), exactly_one=False)
+                        for place, (lat, lng) in g:
+                            latlng = (lat, lng)
+                            break
+                    except URLError:
+                        e = sys.exc_info()[1]
+                        print "Unable to connect to GeoNames: %s" % (e)
             tuple_data[Location.LATLNG] = latlng
         val = None
         if tuple_data[Location.LATLNG] != None:
