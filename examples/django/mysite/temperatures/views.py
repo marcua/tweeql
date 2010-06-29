@@ -3,7 +3,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
-from sqlalchemy import create_engine, MetaData, select,and_, or_, not_
+from sqlalchemy import create_engine, MetaData, select,and_, or_, not_, Integer, cast
 from sqlalchemy.sql import func
 import json
 
@@ -62,14 +62,12 @@ def generate_placemarks_kml(temperature_table, db_conn):
                         temperature_table.c.temperature > 0.0,
                         temperature_table.c.temperature < 120.0, 
                         temperature_table.c.created_at > yesterday)
-    #data_query = select([func.round(temperature_table.c.latitude).label('latitude'),
-    #                     func.round(temperature_table.c.longitude).label('longitude'),
-    #                     func.avg(temperature_table.c.temperature).label('temperature')],where_clause).\
-    #                     group_by(func.round(temperature_table.c.latitude),func.round(temperature_table.c.latitude))
-    data_query = select([temperature_table.c.latitude.label('latitude'),
-                         temperature_table.c.longitude.label('longitude'),
-                         func.avg(temperature_table.c.temperature).label('temperature')],where_clause).\
-                         group_by(temperature_table.c.latitude,temperature_table.c.latitude)
+    latcol = cast(temperature_table.c.latitude, Integer).label('latitude')
+    longcol = cast(temperature_table.c.longitude, Integer).label('longitude')
+    data_query = select([latcol, longcol, 
+                         func.avg(temperature_table.c.temperature).label('temperature')],
+                        where_clause).\
+                       group_by(latcol, longcol)
     maxT_query = select([func.max(temperature_table.c.temperature)], where_clause)
     minT_query = select([func.min(temperature_table.c.temperature)], where_clause)
 
@@ -150,12 +148,23 @@ def begin_kml():
 
 def end_kml():
     end='''
+  <ScreenOverlay>
+    <name>Absolute Positioning: Top left</name>
+    <visibility>1</visibility>
+    <Icon>
+      <href>http://kml-samples.googlecode.com/svn/trunk/resources/top_left.jpg</href>
+    </Icon>
+    <overlayXY x=".95" y=".8" xunits="fraction" yunits="fraction"/>
+    <screenXY x=".95" y=".8" xunits="fraction" yunits="fraction"/>
+    <rotationXY x="0" y="0" xunits="fraction" yunits="fraction"/>
+    <size x="0" y="0" xunits="fraction" yunits="fraction"/>
+  </ScreenOverlay>
 </Document>
 </kml>'''
     return end
     
 def generate_weather_kml():
-    engine = create_engine(DB_URI, echo=False)
+    engine = create_engine(DB_URI, echo=True)
     meta = MetaData()
     meta.reflect(bind=engine)
     temperature = meta.tables['tester2']
