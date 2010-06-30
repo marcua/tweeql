@@ -11,11 +11,18 @@ from threading import Thread
 from tweepy import StreamListener
 from tweepy import Stream
 
+import settings
+
 class QueryRunner(StreamListener):
     def __init__(self, status_handler, batch_size = 10000):
         StreamListener.__init__(self)
-        username = raw_input('Twitter username: ')
-        password = getpass('Twitter password: ')
+        try:
+            username = settings.TWITTER_USERNAME
+            password = settings.TWITTER_PASSWORD
+        except AttributeError:
+            print "TWITTER_USERNAME and TWITTER_PASSWORD not defined in settings"
+            username = raw_input('Twitter username: ')
+            password = getpass('Twitter password: ')
         self.status_lock = RLock()
         self.statuses = []
         self.batch_size = batch_size
