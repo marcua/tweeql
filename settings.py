@@ -1,5 +1,8 @@
 from private_settings import *
 
+# Running in debug mode, the system prints a lot more information
+DEBUG = False
+
 REDIS_HOSTNAME = 'localhost'
 REDIS_PORT = 6379
 REDIS_DB = 0
@@ -10,4 +13,3 @@ MAX_MESSAGES = 10000
 TWEET_GROUP_ID = 'tweet-group-id'
 TO_INDEX = 'tweet-groups-to-index'
 CONSUMED_INDICES = 'tweet-groups-consumed'
-#badar

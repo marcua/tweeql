@@ -1,7 +1,11 @@
-from ssql.query_runner import QueryRunner
-from ssql.query_runner import PrintStatusHandler
+from ssql.exceptions import SSQLException
 from ssql.builtin_functions import register
+from ssql.query_runner import PrintStatusHandler
+from ssql.query_runner import QueryRunner
 from time import sleep
+
+import settings
+import traceback
 
 def main():
     register()
@@ -18,6 +22,12 @@ def process_command(runner, cmd):
         runner.run_query(cmd, False)
     except KeyboardInterrupt:
         runner.stop_query()
+    except SSQLException, e:
+        runner.stop_query()
+        if settings.DEBUG:
+            traceback.print_exc()
+        else:
+            print e
 
 if __name__ == '__main__':
     main()

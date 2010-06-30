@@ -61,10 +61,11 @@ class QueryRunner(StreamListener):
         handler.handle_statuses(passes)
     def flush_statuses(self):
         self.status_lock.acquire()
-        filter_func = lambda s=self.statuses, q=self.query, h=self.status_handler: self.filter_statuses(s,q,h)
-        t = Thread(target = filter_func)
-        t.start()
-        self.statuses = []
+        if len(self.statuses) > 0:
+            filter_func = lambda s=self.statuses, q=self.query, h=self.status_handler: self.filter_statuses(s,q,h)
+            t = Thread(target = filter_func)
+            t.start()
+            self.statuses = []
         self.status_lock.release()
 
     """ StreamListener methods """

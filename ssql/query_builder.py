@@ -1,4 +1,5 @@
 from itertools import chain
+from pyparsing import ParseException
 from ssql import operators
 from ssql.aggregation import get_aggregate_factory
 from ssql.operators import StatusSource
@@ -30,7 +31,11 @@ class QueryBuilder:
         """
             Takes a Unicode string query_str, and outputs a query tree
         """
-        parsed = self.parser.parseString(query_str)
+        try:
+            parsed = self.parser.parseString(query_str)
+        except ParseException,e:
+            raise QueryException(e)
+
         source = self.__get_source(parsed)
         tree = self.__get_tree(parsed)
         query = Query(tree, source)
