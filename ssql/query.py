@@ -1,7 +1,8 @@
 class Query():
-    def __init__(self, query_tree, source):
+    def __init__(self, query_tree, source, handler):
         self.query_tree = query_tree
         self.source = source
+        self.handler = handler
     def get_tuple_descriptor(self):
         return self.query_tree.get_tuple_descriptor()
 
@@ -10,6 +11,7 @@ class QueryTokens:
     FROM = "FROM"
     WHERE = "WHERE"
     GROUPBY = "GROUP BY"
+    INTO = "INTO"
     WINDOW = "WINDOW"
     TWITTER = "TWITTER"
     TWITTER_SAMPLE = "TWITTER_SAMPLE"
@@ -25,6 +27,9 @@ class QueryTokens:
     SUM = "SUM"
     MIN = "MIN"
     MAX = "MAX"
+    STDOUT = "STDOUT"
+    TABLE = "TABLE"
+    STREAM = "STREAM"
     EQUALS = "="
     DOUBLE_EQUALS = "=="
     EXCLAIM_EQUALS = "!="

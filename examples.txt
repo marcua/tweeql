@@ -1,4 +1,10 @@
+# both of these print to stdout
 select text from twitter_sample;
+select text from twitter_sample INTO STDOUT;
+
+# dump results to table test123
+select text from twitter_sample INTO TABLE test123;
+
 select location, text from twitter_sample;
 SELECT text FROM Twitter WHERE text CONTAINS 'Wind' and text CONTAINS '°F';
 SELECT text FROM Twitter WHERE text CONTAINS 'Wind' AND (text contains '°F' OR text CONTAINS '°C');

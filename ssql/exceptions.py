@@ -9,3 +9,6 @@ class QueryException(SSQLException):
 
 class DbException(SSQLException):
     pass
+
+class SettingsException(SSQLException):
+    pass

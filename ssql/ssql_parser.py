@@ -11,6 +11,7 @@ def gen_parser():
     selectStmt = Forward()
     selectToken = Keyword(QueryTokens.SELECT, caseless=True)
     fromToken   = Keyword(QueryTokens.FROM, caseless=True)
+    intoToken   = Keyword(QueryTokens.INTO, caseless=True)
     groupByToken   = Keyword(QueryTokens.GROUPBY, caseless=True)
     windowToken   = Keyword(QueryTokens.WINDOW, caseless=True)
     asToken = Keyword(QueryTokens.AS, caseless=True).setParseAction(upcaseTokens)
@@ -31,7 +32,12 @@ def gen_parser():
     tableName      = delimitedList( ident, ".", combine=True ).setParseAction(upcaseTokens)
     tableNameList  = Group( delimitedList( tableName ) )
     timeExpression = Word( nums ) + oneOf("seconds minutes hours days", caseless=True).setParseAction(downcaseTokens)
-    
+   
+    stdoutToken = Keyword(QueryTokens.STDOUT, caseless=True).setParseAction(upcaseTokens)
+    tableToken = Keyword(QueryTokens.TABLE, caseless=True).setParseAction(upcaseTokens)
+    streamToken = Keyword(QueryTokens.STREAM, caseless=True).setParseAction(upcaseTokens)
+    intoLocation = stdoutToken | ( tableToken + ident ) | ( streamToken + ident ) 
+
     whereExpression = Forward()
     and_ = Keyword(QueryTokens.AND, caseless=True).setParseAction(upcaseTokens)
     or_ = Keyword(QueryTokens.OR, caseless=True).setParseAction(upcaseTokens)
@@ -60,6 +66,7 @@ def gen_parser():
             Group ( selectToken + columnExpressionList ).setResultsName( "select" ) + 
             fromToken + 
             tableNameList.setResultsName( "sources" ) + 
+            Optional(intoToken + intoLocation, "").setResultsName("into") + 
             Optional( Group( CaselessLiteral(QueryTokens.WHERE) + whereExpression ), "" ).setResultsName("where") +
             Optional ( groupByToken + columnExpressionList, "").setResultsName("groupby") +
             Optional ( windowToken + timeExpression, "").setResultsName("window")

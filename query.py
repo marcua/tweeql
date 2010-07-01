@@ -1,6 +1,5 @@
 from ssql.exceptions import SSQLException
 from ssql.builtin_functions import register
-from ssql.query_runner import DbInsertStatusHandler
 from ssql.query_runner import QueryRunner
 from time import sleep
 
@@ -9,8 +8,7 @@ import traceback
 
 def main():
     register()
-    insert_handler = DbInsertStatusHandler('tester2', 'sqlite:///test.db')
-    runner = QueryRunner(insert_handler, batch_size=10)
+    runner = QueryRunner(batch_size=1)
     try:
         while True:
             cmd = raw_input("ssql> ");

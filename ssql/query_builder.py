@@ -4,6 +4,7 @@ from ssql import operators
 from ssql.aggregation import get_aggregate_factory
 from ssql.operators import StatusSource
 from ssql.exceptions import QueryException
+from ssql.exceptions import DbException
 from ssql.field_descriptor import FieldDescriptor
 from ssql.field_descriptor import FieldType
 from ssql.field_descriptor import ReturnType
@@ -11,6 +12,8 @@ from ssql.function_registry import FunctionRegistry
 from ssql.query import Query
 from ssql.query import QueryTokens
 from ssql.ssql_parser import gen_parser
+from ssql.status_handlers import PrintStatusHandler
+from ssql.status_handlers import DbInsertStatusHandler
 from ssql.tuple_descriptor import TupleDescriptor
 from ssql.twitter_fields import twitter_tuple_descriptor
 
@@ -38,7 +41,8 @@ class QueryBuilder:
 
         source = self.__get_source(parsed)
         tree = self.__get_tree(parsed)
-        query = Query(tree, source)
+        handler = self.__get_handler(parsed)
+        query = Query(tree, source, handler)
         return query
     def __get_source(self, parsed):
         source = parsed.sources[0]
@@ -57,6 +61,18 @@ class QueryBuilder:
         (tree, where_fields) = self.__parse_where(where_clause)
         tree = self.__add_select_and_aggregate(select, groupby, where_fields, window, tree)
         return tree
+    def __get_handler(self, parsed):
+        into = parsed.into.asList()
+        handler = None
+        if (into == ['']) or (into[1] == QueryTokens.STDOUT):
+            handler = PrintStatusHandler()
+        elif (len(into) == 3) and (into[1] == QueryTokens.TABLE):
+            handler = DbInsertStatusHandler(into[2])
+        elif (len(into) == 3) and (into[1] == QueryTokens.STREAM):
+            raise DbException("Putting results into a STREAM is not yet supported")
+        else:
+            raise QueryException("Invalid INTO clause")
+        return handler
     def __parse_where(self, where_clause):
         tree = None
         where_fields = []
