@@ -1,7 +1,6 @@
 from ssql.exceptions import SSQLException
-from ssql.builtin_functions import register
+from ssql.builtin_functions import register_default_functions
 from ssql.query_runner import QueryRunner
-from time import sleep
 
 import settings
 import traceback
