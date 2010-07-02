@@ -7,7 +7,7 @@ import settings
 import traceback
 
 def main():
-    register()
+    register_default_functions()
     runner = QueryRunner(batch_size=1)
     try:
         while True:

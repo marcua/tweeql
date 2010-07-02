@@ -1,3 +1,39 @@
+event structure
+  - classification
+fixed vs. narrative sturcture
+
+viz. ideas: "good morning" art
+
+
+extraction
+sentiment
+event detection
+time-travel
+
+SELECT text, temperatureF(text) as temperature, location FROM Twitter WHERE (text contains 'c' or text contains 'f') AND temperature != NULL;
+
+select text from twitter where text contains 'worldcup'
+
+
+
+
+
+
+
+
+previous version (text CONTAINS 'wind')
+
+
+
+
+
+
+
+
+
+
+
+
 # both of these print to stdout
 select text from twitter_sample;
 select text from twitter_sample INTO STDOUT;

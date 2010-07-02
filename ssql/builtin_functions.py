@@ -41,7 +41,7 @@ class Location:
     LNG = "lng"
 
     @staticmethod
-    def get_latlng(tuple_data, *args):
+    def get_latlng(tuple_data, lat_or_long):
         if not Location.LATLNG in tuple_data:
             latlng = None
             if tuple_data["coordinates"] != None:
@@ -61,13 +61,13 @@ class Location:
             tuple_data[Location.LATLNG] = latlng
         val = None
         if tuple_data[Location.LATLNG] != None:
-            if args[0] == Location.LAT:
+            if lat_or_long == Location.LAT:
                 val = tuple_data[Location.LATLNG][0]
-            elif args[0] == Location.LNG:
+            elif lat_or_long == Location.LNG:
                 val = tuple_data[Location.LATLNG][1]
         return val
 
-def register():
+def register_default_functions():
     fr = FunctionRegistry()
     fr.register("temperatureF", FunctionInformation(Temperature.temperature_f, Temperature.return_type))
     fr.register("tweetLatLng", FunctionInformation(Location.get_latlng, Location.return_type))
