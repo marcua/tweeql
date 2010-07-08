@@ -80,3 +80,5 @@ class QueryRunner(StreamListener):
         return True # keep stream alive
     def on_timeout(self):
         print 'Snoozing Zzzzzz'
+    def on_limit(self, limit_data):
+        print "Limited", limit_data
