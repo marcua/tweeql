@@ -7,13 +7,16 @@ from sqlalchemy.exc import ArgumentError
 import settings
 
 class StatusHandler(object):
+    def __init__(self, batch_size):
+        self.batch_size = batch_size
     def handle_statuses(self, statuses):
         raise NotImplementedError()
     def set_tuple_descriptor(self, descriptor):
         self.tuple_descriptor = descriptor
 
 class PrintStatusHandler(StatusHandler):
-    def __init__(self, delimiter = u"|"):
+    def __init__(self, batch_size, delimiter = u"|"):
+        super(PrintStatusHandler, self).__init__(batch_size)
         self.delimiter = delimiter
 
     def handle_statuses(self, statuses):
@@ -23,7 +26,8 @@ class PrintStatusHandler(StatusHandler):
             print self.delimiter.join(vals)
 
 class DbInsertStatusHandler(StatusHandler):
-    def __init__(self, tablename):
+    def __init__(self, batch_size, tablename):
+        super(DbInsertStatusHandler, self).__init__(batch_size)
         try:
             self.dburi = settings.DATABASE_URI
             self.engine = create_engine(self.dburi, echo=False)

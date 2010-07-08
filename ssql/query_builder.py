@@ -65,9 +65,9 @@ class QueryBuilder:
         into = parsed.into.asList()
         handler = None
         if (into == ['']) or (into[1] == QueryTokens.STDOUT):
-            handler = PrintStatusHandler()
+            handler = PrintStatusHandler(1)
         elif (len(into) == 3) and (into[1] == QueryTokens.TABLE):
-            handler = DbInsertStatusHandler(into[2])
+            handler = DbInsertStatusHandler(1000, into[2])
         elif (len(into) == 3) and (into[1] == QueryTokens.STREAM):
             raise DbException("Putting results into a STREAM is not yet supported")
         else:

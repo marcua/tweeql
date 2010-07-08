@@ -7,7 +7,7 @@ import traceback
 
 def main():
     register_default_functions()
-    runner = QueryRunner(batch_size=1)
+    runner = QueryRunner()
     try:
         while True:
             cmd = raw_input("ssql> ");
