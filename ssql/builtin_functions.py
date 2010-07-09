@@ -4,6 +4,7 @@ from ssql.field_descriptor import ReturnType
 from ssql.function_registry import FunctionInformation
 from ssql.function_registry import FunctionRegistry
 from geopy import geocoders
+from ordereddict import OrderedDict
 from urllib2 import URLError
 
 import re
@@ -33,32 +34,27 @@ class Temperature():
                 temperature = ((9.0/5) * temperature) + 32
         return temperature
 
+
 class Location:
+    class LruDict(OrderedDict):
+        def __setitem__(self, key, value):
+            self.pop(key, None)
+            OrderedDict.__setitem__(self, key, value)
+        def compact_to_size(self, size):
+            while len(self) > size:
+                self.popitem(last=False)
+
     gn = geocoders.GeoNames()
     return_type = ReturnType.FLOAT
     LATLNG = "__LATLNG"
     LAT = "lat"
     LNG = "lng"
+    cache = LruDict()
 
     @staticmethod
     def get_latlng(tuple_data, lat_or_long):
         if not Location.LATLNG in tuple_data:
-            latlng = None
-            if tuple_data["coordinates"] != None:
-                coords = tuple_data["coordinates"]["coordinates"]
-                latlng = (coords[1], coords[0])
-            if latlng == None:
-                loc = tuple_data["user"].location
-                if (loc != None) and (loc != ""):
-                    try:
-                        g = Location.gn.geocode(loc.encode('utf-8'), exactly_one=False)
-                        for place, (lat, lng) in g:
-                            latlng = (lat, lng)
-                            break
-                    except URLError:
-                        e = sys.exc_info()[1]
-                        print "Unable to connect to GeoNames: %s" % (e)
-            tuple_data[Location.LATLNG] = latlng
+            tuple_data[Location.LATLNG] = Location.extract_latlng(tuple_data)
         val = None
         if tuple_data[Location.LATLNG] != None:
             if lat_or_long == Location.LAT:
@@ -66,6 +62,36 @@ class Location:
             elif lat_or_long == Location.LNG:
                 val = tuple_data[Location.LATLNG][1]
         return val
+    
+    @staticmethod
+    def extract_latlng(tuple_data):
+        latlng = None
+        if tuple_data["coordinates"] != None:
+            coords = tuple_data["coordinates"]["coordinates"]
+            latlng = (coords[1], coords[0])
+        if latlng == None:
+            loc = tuple_data["user"].location
+            if (loc != None) and (loc != ""):
+                loc = loc.lower()
+                latlng = Location.cache.get(loc, None)
+                if latlng == None:
+                    latlng = Location.geonames_latlng(loc)
+                Location.cache[loc] = latlng
+                Location.cache.compact_to_size(5000)
+        return latlng
+
+    @staticmethod
+    def geonames_latlng(loc):
+        latlng = None
+        try:
+            g = Location.gn.geocode(loc.encode('utf-8'), exactly_one=False)
+            for place, (lat, lng) in g:
+                latlng = (lat, lng)
+                break
+        except URLError:
+            e = sys.exc_info()[1]
+            print "Unable to connect to GeoNames: %s" % (e)
+        return latlng
 
 def register_default_functions():
     fr = FunctionRegistry()
