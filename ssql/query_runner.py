@@ -80,4 +80,4 @@ class QueryRunner(StreamListener):
     def on_timeout(self):
         print 'Snoozing Zzzzzz'
     def on_limit(self, limit_data):
-        print "Limited", limit_data
+        print "Twitter rate-limited this query.  Since query start, Twitter dropped %d messages." % (limit_data)
