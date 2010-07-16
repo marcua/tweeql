@@ -247,7 +247,6 @@ class QueryBuilder:
             elif field[0] == QueryTokens.FLOAT_LITERAL:
                 return_type = ReturnType.FLOAT
                 literal_value = float(literal_value)
-            print return_type
         elif field[0] == QueryTokens.COLUMN_NAME: # field or alias
             if alias == None:
                 alias = field[1]
