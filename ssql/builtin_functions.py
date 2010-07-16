@@ -23,17 +23,19 @@ class Temperature():
         """
         fahr_search = Temperature.fahr.search(status)
         temperature = None
-        if fahr_search != None:
-            temperature = fahr_search.group(2).replace(",", ".")
-            temperature = float(temperature)
-        else:
-            celcius_search = Temperature.celcius.search(status)
-            if celcius_search != None:
-                temperature = celcius_search.group(2).replace(",", ".")
+        try:
+            if fahr_search != None:
+                temperature = fahr_search.group(2).replace(",", ".")
                 temperature = float(temperature)
-                temperature = ((9.0/5) * temperature) + 32
+            else:
+                celcius_search = Temperature.celcius.search(status)
+                if celcius_search != None:
+                    temperature = celcius_search.group(2).replace(",", ".")
+                    temperature = float(temperature)
+                    temperature = ((9.0/5) * temperature) + 32
+        except ValueError:
+            print "Encoding error on '%s'" % (status)
         return temperature
-
 
 class Location:
     class LruDict(OrderedDict):
