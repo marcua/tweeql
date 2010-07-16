@@ -2,7 +2,7 @@ Query to show how twitter rate limits high-traffic queries
 select text from twitter into table testlimit where text contains 'and' or text contains 'is' or text contains 'the'
 
 Follow the last two games of the world cup
-select created_at, lang, text from twitter into table worldcup2 where text contains 'worldcup' or text contains 'ned' or text contains 'spa' or text contains 'ger' or text contains 'world cup';
+select created_at, lang, text from twitter into table worldcup2 where text contains 'worldcup' or text contains 'ned' or text contains 'spa' or text contains 'ger' or text contains 'world cup' or text contains 'uru';
 
 event structure
   - classification
@@ -37,12 +37,18 @@ SELECT temperatureF(text) as temperature, location FROM Twitter WHERE text CONTA
 test NULL---should return only filled temperatures
 SELECT text, temperatureF(text) as temperature, location FROM Twitter WHERE text CONTAINS 'Wind' AND temperature != NULL;
 
+test the floor function
+SELECT floor(temperatureF(text), 2.5)  as round_temperature, temperatureF(text) as temperature, location FROM Twitter WHERE (text contains 'F' OR text CONTAINS 'C') and temperature != NULL;
+
 test lat/long extractor for location
 SELECT text, temperatureF(text) as temperature, created_at, location, tweetLatLng("lat") as latitude, tweetLatLng("lng") as longitude FROM Twitter WHERE (text contains 'c' or text contains 'f') AND temperature != NULL;
 previous version (text CONTAINS 'wind')
 
 dump results into table tester2
 SELECT text, temperatureF(text) as temperature, created_at, location, tweetLatLng("lat") as latitude, tweetLatLng("lng") as longitude FROM Twitter into table tester2 WHERE (text contains 'c' or text contains 'f') AND temperature != NULL;
+
+determine how many standard deviations away a temperature is
+SELECT text, temperatureF(text) as temperature, created_at, location, tweetLatLng("lat") as latitude, tweetLatLng("lng") as longitude, normalStdevs(temperature, latitude, longitude) as stdevs FROM Twitter into table weather_stdev WHERE (text contains 'c' or text contains 'f') AND temperature != NULL;
 
 select temperatureF(text) as temp, text from twitter where (text contains 'c' or text contains 'f') and temp != NULL;
 

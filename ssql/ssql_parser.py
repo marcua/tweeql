@@ -16,16 +16,32 @@ def gen_parser():
     windowToken   = Keyword(QueryTokens.WINDOW, caseless=True)
     asToken = Keyword(QueryTokens.AS, caseless=True).setParseAction(upcaseTokens)
     nullToken = Keyword(QueryTokens.NULL, caseless=False).setParseAction(replace(QueryTokens.NULL_TOKEN))
+    
+    # Math operators
+    E = CaselessLiteral("E")
+    binop = oneOf("= != < > >= <= == eq ne lt le gt ge %s" % (QueryTokens.CONTAINS), caseless=True).setParseAction(upcaseTokens)
+    arithSign = Word("+-",exact=1)
+    realNum = Combine( Optional(arithSign) + ( Word( nums ) + "." + Optional( Word(nums) )  |
+                ( "." + Word(nums) ) ) + 
+            Optional( E + Optional(arithSign) + Word(nums) ) )
+    intNum = Combine( Optional(arithSign) + Word( nums ) + 
+            Optional( E + Optional("+") + Word(nums) ) )
 
     ident          = Word( alphas, alphanums + "_$" ).setName("identifier")
     columnName     = delimitedList( ident, ".", combine=True )
     columnName.setParseAction(label(QueryTokens.COLUMN_NAME))
     aliasName     = delimitedList( ident, ".", combine=True )
-    literalArgument = Forward()
-    literalArgument << quotedString
-    literalArgument.setParseAction(label(QueryTokens.LITERAL))
+    stringLiteral = Forward()
+    stringLiteral << quotedString
+    stringLiteral.setParseAction(label(QueryTokens.STRING_LITERAL))
+    intLiteral = Forward()
+    intLiteral << intNum
+    intLiteral.setParseAction(label(QueryTokens.INTEGER_LITERAL))
+    floatLiteral = Forward()
+    floatLiteral << realNum
+    floatLiteral.setParseAction(label(QueryTokens.FLOAT_LITERAL))
     columnExpression = Forward()
-    columnFunction = Word(alphas, alphanums) + "(" + Optional(delimitedList(Group ( literalArgument ) | columnExpression)) + ")" 
+    columnFunction = Word(alphas, alphanums) + "(" + Optional(delimitedList(Group( floatLiteral ) | Group ( stringLiteral ) | Group( intLiteral ) | columnExpression)) + ")" 
     columnFunction.setParseAction(label(QueryTokens.FUNCTION_OR_AGGREGATE))
     columnExpression << Group ( (columnFunction | columnName) + Optional( asToken + aliasName ) )
     columnExpressionList = Group( delimitedList( columnExpression ) )
@@ -42,15 +58,6 @@ def gen_parser():
     and_ = Keyword(QueryTokens.AND, caseless=True).setParseAction(upcaseTokens)
     or_ = Keyword(QueryTokens.OR, caseless=True).setParseAction(upcaseTokens)
     in_ = Keyword(QueryTokens.IN, caseless=True).setParseAction(upcaseTokens)
-
-    E = CaselessLiteral("E")
-    binop = oneOf("= != < > >= <= == eq ne lt le gt ge %s" % (QueryTokens.CONTAINS), caseless=True).setParseAction(upcaseTokens)
-    arithSign = Word("+-",exact=1)
-    realNum = Combine( Optional(arithSign) + ( Word( nums ) + "." + Optional( Word(nums) )  |
-                ( "." + Word(nums) ) ) + 
-            Optional( E + Optional(arithSign) + Word(nums) ) )
-    intNum = Combine( Optional(arithSign) + Word( nums ) + 
-            Optional( E + Optional("+") + Word(nums) ) )
 
     columnRval = realNum | intNum | nullToken | columnExpression | quotedString.setParseAction(removeQuotes)
     whereCondition = Group(

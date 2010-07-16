@@ -2,7 +2,7 @@ class FieldType():
     AGGREGATE = "AGGREGATE"  # Returns an aggregate
     FUNCTION = "FUNCTION"    # Returns a function over a field
     FIELD = "FIELD"          # Returns a field from the tuple
-    LITERAL = "LITERAL"      # Returns a string literal
+    LITERAL = "LITERAL"      # Returns a literal (string, int, or float)
     UNDEFINED = "UNDEFINED"  # Not a legitimate field---shouldn't appear in parsed query
 
 class ReturnType():
