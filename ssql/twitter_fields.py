@@ -13,6 +13,7 @@ class TwitterFields:
     TEXT = "text"
     USER = "user"
     LOCATION = "location"
+    LANG = "lang"
     CREATED_AT = "created_at"
     
 
@@ -20,6 +21,7 @@ def twitter_tuple_descriptor():
     fields = [
         FieldDescriptor(TwitterFields.TEXT, [TwitterFields.TEXT], FieldType.FIELD, ReturnType.STRING),
         FieldDescriptor(TwitterFields.LOCATION, [], FieldType.FUNCTION, ReturnType.STRING, None, twitter_user_data_extractor(TwitterFields.LOCATION)),
+        FieldDescriptor(TwitterFields.LANG, [], FieldType.FUNCTION, ReturnType.STRING, None, twitter_user_data_extractor(TwitterFields.LANG)),
         FieldDescriptor(TwitterFields.CREATED_AT, [TwitterFields.CREATED_AT], FieldType.FIELD, ReturnType.DATETIME)
     ]
     return TupleDescriptor(fields)

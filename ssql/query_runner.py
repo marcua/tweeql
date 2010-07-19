@@ -12,7 +12,7 @@ from tweepy import Stream
 import settings
 
 class QueryRunner(StreamListener):
-    def __init__(self, batch_size = 10000):
+    def __init__(self):
         StreamListener.__init__(self)
         try:
             username = settings.TWITTER_USERNAME
@@ -23,7 +23,6 @@ class QueryRunner(StreamListener):
             password = getpass('Twitter password: ')
         self.status_lock = RLock()
         self.statuses = []
-        self.batch_size = batch_size
         self.query_builder = gen_query_builder()
         self.stream = Stream(username,
                              password,
@@ -72,7 +71,7 @@ class QueryRunner(StreamListener):
         t.set_tuple_descriptor(None)
         t.set_data(status.__dict__)
         self.statuses.append(t)
-        if len(self.statuses) >= self.batch_size:
+        if len(self.statuses) >= self.query.handler.batch_size:
             self.flush_statuses()
         self.status_lock.release()
     def on_error(self, status_code):
@@ -80,3 +79,5 @@ class QueryRunner(StreamListener):
         return True # keep stream alive
     def on_timeout(self):
         print 'Snoozing Zzzzzz'
+    def on_limit(self, limit_data):
+        print "Twitter rate-limited this query.  Since query start, Twitter dropped %d messages." % (limit_data)

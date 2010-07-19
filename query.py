@@ -1,14 +1,13 @@
 from ssql.exceptions import SSQLException
-from ssql.builtin_functions import register
+from ssql.builtin_functions import register_default_functions
 from ssql.query_runner import QueryRunner
-from time import sleep
 
 import settings
 import traceback
 
 def main():
-    register()
-    runner = QueryRunner(batch_size=1)
+    register_default_functions()
+    runner = QueryRunner()
     try:
         while True:
             cmd = raw_input("ssql> ");

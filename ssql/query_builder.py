@@ -65,9 +65,9 @@ class QueryBuilder:
         into = parsed.into.asList()
         handler = None
         if (into == ['']) or (into[1] == QueryTokens.STDOUT):
-            handler = PrintStatusHandler()
+            handler = PrintStatusHandler(1)
         elif (len(into) == 3) and (into[1] == QueryTokens.TABLE):
-            handler = DbInsertStatusHandler(into[2])
+            handler = DbInsertStatusHandler(1000, into[2])
         elif (len(into) == 3) and (into[1] == QueryTokens.STREAM):
             raise DbException("Putting results into a STREAM is not yet supported")
         else:
@@ -232,12 +232,21 @@ class QueryBuilder:
         if (len(field) >= 4) and (field[-2] == QueryTokens.AS):
             alias = field[-1]
             field = field[:-2]
-        if field[0] == QueryTokens.LITERAL:
+        if (field[0] == QueryTokens.STRING_LITERAL) or \
+           (field[0] == QueryTokens.INTEGER_LITERAL) or \
+           (field[0] == QueryTokens.FLOAT_LITERAL): 
             alias = self.unnamed_operator_name()
             underlying_fields = []
             field_type = FieldType.LITERAL
-            return_type = ReturnType.STRING
             literal_value = field[1]
+            if field[0] == QueryTokens.STRING_LITERAL:
+                return_type = ReturnType.STRING
+            elif field[0] == QueryTokens.INTEGER_LITERAL:
+                return_type = ReturnType.INTEGER
+                literal_value = int(literal_value)
+            elif field[0] == QueryTokens.FLOAT_LITERAL:
+                return_type = ReturnType.FLOAT
+                literal_value = float(literal_value)
         elif field[0] == QueryTokens.COLUMN_NAME: # field or alias
             if alias == None:
                 alias = field[1]
