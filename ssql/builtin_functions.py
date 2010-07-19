@@ -33,6 +33,22 @@ class Temperature():
                 temperature = ((9.0/5) * temperature) + 32
         return temperature
 
+class Sentiment:
+    positive = [':)',':-)']
+    negative = [ ':(' , ':-(']
+    return_type = ReturnType.FLOAT
+    
+    @staticmethod
+    def sentiment(tuple_data, status):
+        words = status.split()
+        for word in words:    
+            if word in Sentiment.positive:
+                return 1
+            elif word in Sentiment.negative:
+                return -1
+        return 0
+        
+        
 class Location:
     gn = geocoders.GeoNames()
     return_type = ReturnType.FLOAT
@@ -67,7 +83,9 @@ class Location:
                 val = tuple_data[Location.LATLNG][1]
         return val
 
+
 def register():
     fr = FunctionRegistry()
     fr.register("temperatureF", FunctionInformation(Temperature.temperature_f, Temperature.return_type))
     fr.register("tweetLatLng", FunctionInformation(Location.get_latlng, Location.return_type))
+    fr.register("sentiment", FunctionInformation(Sentiment.sentiment, Sentiment.return_type))
