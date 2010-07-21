@@ -22,5 +22,5 @@ positive/negative/neutral classes).
 testdata.manual.2009.05.25 is provided by
 http://twittersentiment.appspot.com/, as is the training technique of
 capturing ":)" and ":(" tweets on twitter to create happy/sad.txt.
-sentiment.pkl.gz.650k.10kfeat is a classifier which contains 10k features
+sentiment.pkl.gz is a classifier which trained on 10k features
 extracted from 650k happy and 650k sad examples.
