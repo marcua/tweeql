@@ -222,7 +222,7 @@ class QueryBuilder:
         underlying_fields = None
         aggregate_factory = None
         literal_value = None
-        function = None
+        func_factory = None
         fields_to_verify = []
         parsed_fds = []
         field_backup = list(field)
@@ -263,7 +263,7 @@ class QueryBuilder:
                 return_type = field_descriptor.return_type
                 underlying_fields = field_descriptor.underlying_fields
                 aggregate_factory = field_descriptor.aggregate_factory
-                function = field_descriptor.function
+                func_factory = field_descriptor.func_factory
         elif field[0] == QueryTokens.FUNCTION_OR_AGGREGATE: # function or aggregate  
             if alias == None:
                 if alias_on_complex_types:
@@ -287,13 +287,13 @@ class QueryBuilder:
                 function_information = self.function_registry.get_function(field[1])
                 if function_information != None:
                     field_type = FieldType.FUNCTION
-                    function = function_information.function
+                    func_factory = function_information.func_factory
                     return_type = function_information.return_type
                 else:
                     raise QueryException("'%s' is neither an aggregate or a registered function" % (field[1]))
         else:
             raise QueryException("Empty field clause found: %s" % ("".join(field_backup)))
-        fd = FieldDescriptor(alias, underlying_fields, field_type, return_type, aggregate_factory, function, literal_value)
+        fd = FieldDescriptor(alias, underlying_fields, field_type, return_type, aggregate_factory, func_factory, literal_value)
         fd.visible = make_visible
         parsed_fds.insert(0, fd)
         return (parsed_fds, fields_to_verify)
@@ -314,6 +314,7 @@ class QueryBuilder:
                 field_descriptor.field_type = referenced_field_descriptor.field_type
                 field_descriptor.return_type = referenced_field_descriptor.return_type
                 field_descriptor.aggregate_factory = referenced_field_descriptor.aggregate_factory
+                field_descriptor.func_factory = referenced_field_descriptor.func_factory
                 field_descriptor.function = referenced_field_descriptor.function
         if error:
             raise QueryException("Field '%s' is neither a builtin field nor an alias" % (field))

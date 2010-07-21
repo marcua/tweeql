@@ -13,13 +13,16 @@ class ReturnType():
     UNDEFINED = "UNDEFINED"  # Not a legitimate type---shouldn't appear in parsed query
 
 class FieldDescriptor():
-    def __init__(self, alias, underlying_fields, field_type, return_type, aggregate_factory=None, function=None, literal_value=None):
+    def __init__(self, alias, underlying_fields, field_type, return_type, aggregate_factory=None, func_factory=None, literal_value=None):
         self.alias = alias
         self.underlying_fields = underlying_fields
         self.field_type = field_type
         self.return_type = return_type
         self.aggregate_factory = aggregate_factory
-        self.function = function
+        self.func_factory = func_factory
+        self.function = None
+        if func_factory != None:
+            self.function = func_factory()
         self.literal_value = literal_value
         self.visible = True
     def __eq__(self, other):
@@ -29,7 +32,7 @@ class FieldDescriptor():
                (self.field_type == other.field_type) and \
                (self.return_type == other.return_type) and \
                (self.aggregate_factory == other.aggregate_factory) and \
-               (self.function == other.function) and \
+               (self.func_factory == other.func_factory) and \
                (self.literal_value == other.literal_value)
         else:
             return NotImplemented

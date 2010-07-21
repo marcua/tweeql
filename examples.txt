@@ -1,3 +1,7 @@
+language detection on short text
+momemtum query
+
+
 Query to show how twitter rate limits high-traffic queries
 select text from twitter into table testlimit where text contains 'and' or text contains 'is' or text contains 'the'
 
@@ -47,8 +51,10 @@ previous version (text CONTAINS 'wind')
 dump results into table tester2
 SELECT text, temperatureF(text) as temperature, created_at, location, tweetLatLng("lat") as latitude, tweetLatLng("lng") as longitude FROM Twitter into table tester2 WHERE (text contains 'c' or text contains 'f') AND temperature != NULL;
 
-determine how many standard deviations away a temperature is
-SELECT text, temperatureF(text) as temperature, created_at, location, tweetLatLng("lat") as latitude, tweetLatLng("lng") as longitude, normalStdevs(temperature, latitude, longitude) as stdevs FROM Twitter into table weather_stdev WHERE (text contains 'c' or text contains 'f') AND temperature != NULL;
+determine how many mean deviations away a temperature is
+SELECT text, temperatureF(text) as temperature, created_at, location, tweetLatLng("lat") as latitude, tweetLatLng("lng") as longitude, meanDevs(temperature, floor(tweetLatLng("lat"), 5), floor(tweetLatLng("lng"), 5)) as meandevs FROM Twitter INTO TABLE weather_meandev WHERE (text contains 'c' or text contains 'f') AND temperature != NULL;
+
+SELECT text, location from twitter where text contains 'malware' or text contains 'virus'
 
 select temperatureF(text) as temp, text from twitter where (text contains 'c' or text contains 'f') and temp != NULL;
 

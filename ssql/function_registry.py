@@ -1,8 +1,8 @@
 from ssql.exceptions import QueryException
 
 class FunctionInformation():
-    def __init__(self, function, return_type):
-        self.function = function
+    def __init__(self, func_factory, return_type):
+        self.func_factory = func_factory
         self.return_type = return_type
 
 class FunctionRegistry():

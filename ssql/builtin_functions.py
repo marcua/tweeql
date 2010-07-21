@@ -5,6 +5,7 @@ from ssql.function_registry import FunctionInformation
 from ssql.function_registry import FunctionRegistry
 from geopy import geocoders
 from ordereddict import OrderedDict
+from threading import RLock
 from urllib2 import URLError
 
 import math
@@ -17,7 +18,10 @@ class Temperature():
     return_type = ReturnType.FLOAT
 
     @staticmethod
-    def temperature_f(tuple_data, status):
+    def factory():
+        return Temperature().temperature_f
+
+    def temperature_f(self, tuple_data, status):
         """ 
             Returns the temperature found in 'status' in Fahrenheit.  Captures
             both systems of temperature and then converts to Fahrenheit.
@@ -42,9 +46,15 @@ class Sentiment:
     positive = [':)',':-)']
     negative = [ ':(' , ':-(']
     return_type = ReturnType.FLOAT
-    
+     
     @staticmethod
-    def sentiment(tuple_data, status):
+    def factory():
+        return Sentiment().sentiment
+
+    def __init__(self):
+        pass
+
+    def sentiment(self, tuple_data, status):
         words = status.split()
         for word in words:    
             if word in Sentiment.positive:
@@ -57,7 +67,10 @@ class Rounding():
     return_type = ReturnType.FLOAT
 
     @staticmethod
-    def floor(tuple_data, val, nearest = 1):
+    def factory():
+        return Rounding().floor
+
+    def floor(self, tuple_data, val, nearest = 1):
         """ 
             Returns the largest integer multiple of 'nearest' that is less than or equal to val.
             If nearest is less than 1, you may see funny results because of floating 
@@ -81,9 +94,13 @@ class Location:
     LAT = "lat"
     LNG = "lng"
     cache = LruDict()
+    cache_lock = RLock()
 
     @staticmethod
-    def get_latlng(tuple_data, lat_or_long):
+    def factory():
+        return Location().get_latlng
+
+    def get_latlng(self, tuple_data, lat_or_long):
         if not Location.LATLNG in tuple_data:
             tuple_data[Location.LATLNG] = Location.extract_latlng(tuple_data)
         val = None
@@ -104,11 +121,15 @@ class Location:
             loc = tuple_data["user"].location
             if (loc != None) and (loc != ""):
                 loc = loc.lower()
+                Location.cache_lock.acquire()
                 latlng = Location.cache.get(loc, None)
+                Location.cache_lock.release()
                 if latlng == None:
                     latlng = Location.geonames_latlng(loc)
+                Location.cache_lock.acquire()
                 Location.cache[loc] = latlng
                 Location.cache.compact_to_size(5000)
+                Location.cache_lock.release()
         return latlng
 
     @staticmethod
@@ -124,68 +145,8 @@ class Location:
             print "Unable to connect to GeoNames: %s" % (e)
         return latlng
 
-class NormalOutliers():
-    return_type = ReturnType.FLOAT
-    groups = dict()
-
-    class StdGroup():
-        def __init__(self):
-            self.n = 0
-            self.mean = 0.0
-            self.M2 = 0.0
-            self.ewma = 0.0
-            self.stdev = 0.0
-        def update_and_calculate(self, value):
-            """
-                Returns the number of standard deviations from the EWMA if
-                the number of values previously recorded is >= 5.  Otherwise,
-                returns -1.
-                If the value is less than 2 standard deviations away, it will
-                also update the value as if it is not an outlier.
-            """
-            retval = -1
-            if self.n >= 5: # only calculate stdevs if collected > 5 data pts.
-                diff = self.ewma - value
-                if self.stdev > 0:
-                    stdevs = diff/self.stdev
-                else:
-                    stdevs = diff/.00001
-                retval = abs(stdevs)
-            if retval <= 2: # only update if less than 2 stdevs or still collecting data
-                self.n += 1
-                delta = value - self.mean
-                self.mean += delta/self.n
-                self.M2 += delta*(value - self.mean)
-                if self.n > 1:
-                    self.stdev = math.sqrt(self.M2/(self.n - 1))
-                    self.ewma = (.15*value) + (.85*self.ewma)
-                else:
-                    self.ewma = value
-            return retval 
-
-    @staticmethod
-    def numstdevs(tuple_data, value, *group):
-        """ 
-            Calculates how many standard deviations from the 
-            exponentially weighted moving average value 
-            is, given the other values that have been 
-            given for the elements of this group.
-
-            The return value will be greater than or equal to 0 
-            if it represents the number of standard deviations.
-            If it is less than 0, the group does not have enough data to
-            calculate standard deviations.
-        """
-        std_group = NormalOutliers.groups.get(group, None)
-        if std_group == None:
-            std_group = NormalOutliers.StdGroup()
-            NormalOutliers.groups[group] = std_group
-
-        return std_group.update_and_calculate(value)
-
 class MeanOutliers():
     return_type = ReturnType.FLOAT
-    groups = dict()
 
     class MeanGroup():
         def __init__(self):
@@ -223,7 +184,13 @@ class MeanOutliers():
             return retval 
 
     @staticmethod
-    def nummeandevs(tuple_data, value, *group):
+    def factory():
+        return MeanOutliers().nummeandevs
+
+    def __init__(self):
+        self.groups = dict()
+
+    def nummeandevs(self, tuple_data, value, *group):
         """ 
             Calculates how many mean deviations from the exponentially 
             weighted moving average value is, given the other values that have been 
@@ -248,19 +215,18 @@ class MeanOutliers():
             A good mean deviation cutoff for legitimate values is thus in the range
             2.5-3.75.
         """
-        mean_group = MeanOutliers.groups.get(group, None)
+        mean_group = self.groups.get(group, None)
         if mean_group == None:
             mean_group = MeanOutliers.MeanGroup()
-            MeanOutliers.groups[group] = mean_group
+            self.groups[group] = mean_group
 
         return mean_group.update_and_calculate(value)
 
 def register_default_functions():
     fr = FunctionRegistry()
-    fr.register("temperatureF", FunctionInformation(Temperature.temperature_f, Temperature.return_type))
-    fr.register("tweetLatLng", FunctionInformation(Location.get_latlng, Location.return_type))
-    fr.register("floor", FunctionInformation(Rounding.floor, Rounding.return_type))
-    fr.register("normalStdevs", FunctionInformation(NormalOutliers.numstdevs, NormalOutliers.return_type))
-    fr.register("meanDevs", FunctionInformation(MeanOutliers.nummeandevs, MeanOutliers.return_type))
-    fr.register("sentiment", FunctionInformation(Sentiment.sentiment, Sentiment.return_type))
+    fr.register("temperatureF", FunctionInformation(Temperature.factory, Temperature.return_type))
+    fr.register("tweetLatLng", FunctionInformation(Location.factory, Location.return_type))
+    fr.register("floor", FunctionInformation(Rounding.factory, Rounding.return_type))
+    fr.register("meanDevs", FunctionInformation(MeanOutliers.factory, MeanOutliers.return_type))
+    fr.register("sentiment", FunctionInformation(Sentiment.factory, Sentiment.return_type))
 

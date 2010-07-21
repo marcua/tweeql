@@ -5,9 +5,11 @@ from field_descriptor import ReturnType
 from tuple_descriptor import TupleDescriptor
 
 def twitter_user_data_extractor(field):
-    def extract(data):
-        return getattr(data[TwitterFields.USER], field)
-    return extract
+    def factory():
+        def extract(data):
+            return getattr(data[TwitterFields.USER], field)
+        return extract
+    return factory
 
 class TwitterFields:
     TEXT = "text"
