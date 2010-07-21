@@ -3,14 +3,19 @@
 from ssql.field_descriptor import ReturnType
 from ssql.function_registry import FunctionInformation
 from ssql.function_registry import FunctionRegistry
+from ssql.extras.sentiment.analysis import word_feats, words_in_tweet
 from geopy import geocoders
 from ordereddict import OrderedDict
 from threading import RLock
 from urllib2 import URLError
 
+import gzip
 import math
 import re
+import os
+import pickle
 import sys
+import ssql.extras.sentiment
 
 class Temperature():
     fahr = re.compile(ur"(^| )(\-?\d+([.,]\d+)?)\s*\u00B0?(F$|F |Fahr)", re.UNICODE)
@@ -43,26 +48,36 @@ class Temperature():
         return temperature
 
 class Sentiment:
-    positive = [':)',':-)']
-    negative = [ ':(' , ':-(']
+    classifier = None
+    classinfo = None
     return_type = ReturnType.FLOAT
-     
+    
     @staticmethod
     def factory():
+        if Sentiment.classifier == None:
+            fname = os.path.join(os.path.dirname(ssql.extras.sentiment.__file__), 'sentiment.pkl.gz')
+            fp = gzip.open(fname)
+            classifier_dict = pickle.load(fp)
+            fp.close()
+            Sentiment.classifier = classifier_dict['classifier']
+            Sentiment.classinfo = { classifier_dict['pos_label'] :
+                                      { 'cutoff': classifier_dict['pos_cutoff'],
+                                        'value' : 1.0/classifier_dict['pos_recall'] },
+                                    classifier_dict['neg_label'] :
+                                      { 'cutoff': classifier_dict['neg_cutoff'],
+                                        'value': -1.0/classifier_dict['neg_recall'] }
+                                  }
         return Sentiment().sentiment
 
-    def __init__(self):
-        pass
-
-    def sentiment(self, tuple_data, status):
-        words = status.split()
-        for word in words:    
-            if word in Sentiment.positive:
-                return 1
-            elif word in Sentiment.negative:
-                return -1
-        return 0
-        
+    def sentiment(self, tuple_data, text):
+        dist = Sentiment.classifier.prob_classify(word_feats(words_in_tweet(text)))
+        retval = 0
+        maxlabel = dist.max()
+        classinfo = Sentiment.classinfo[maxlabel]
+        if dist.prob(maxlabel) > classinfo['cutoff']:
+            retval = classinfo['value']
+        return retval
+         
 class Rounding():
     return_type = ReturnType.FLOAT
 

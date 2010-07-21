@@ -19,6 +19,8 @@ url_re = re.compile(ur"((mailto\:|(news|(ht|f)tp(s?))\://){1}\S+)", re.UNICODE)
 emoticon_re = re.compile(ur"\:\)|\:\-\)|\: \)|\:D|\=\)|\:\(\:\-\(\: \(", re.UNICODE)
 tokenizer = nltk.RegexpTokenizer(r'\w+')
 
+def word_feats(words):
+    return dict([(word, True) for word in words])
 
 def words_in_tweet(inputstr):
     outputstr = inputstr

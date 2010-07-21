@@ -1,4 +1,4 @@
-from analysis import load_classifier, words_in_tweet, POSITIVE, NEGATIVE, NEUTRAL
+from analysis import load_classifier, words_in_tweet, POSITIVE, NEGATIVE, NEUTRAL, word_feats
 import collections
 import datetime
 import nltk
@@ -8,9 +8,6 @@ def drange(start, stop, step):
     while r <= stop:
         yield r
         r += step
-
-def word_feats(words):
-    return dict([(word, True) for word in words])
 
 testfile = open('testdata.manual.2009.05.25')
 
