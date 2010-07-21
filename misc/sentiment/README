@@ -1,0 +1,26 @@
+The files in this directory build a naive bayes sentiment classifier.
+
+Files:
+train-nltk.py: run in a directory with two files: happy.txt and sad.txt,
+and it will generate a BayesModel.pkl.gz which contains the pickled/gzipped
+classifier.
+
+test-nltk.py: will test BayesModel.pkl.gz on testdata.manual.2009.05.25
+with cutoffs for positive and negative classification at different
+probability cutoffs.  It reports the precision and recall of the
+positive/negative classifier at different probability cutoffs.  Probability
+cutoffs specify which probability a class (positive or negative) must be
+classified before we believe the classification.  Otherwise, the classifier
+should consider the tweet neutral/not give an answer.
+
+package.py: saves the classifier as well as the parameters for the
+classifier (positive/negative probability cutoffs, precision/recalls for
+positive/negative classes at those cutoffs based on
+testdata.manual.2009.05.25, and labels the classifier will use for
+positive/negative/neutral classes).
+
+testdata.manual.2009.05.25 is provided by
+http://twittersentiment.appspot.com/, as is the training technique of
+capturing ":)" and ":(" tweets on twitter to create happy/sad.txt.
+sentiment.pkl.gz.650k.10kfeat is a classifier which contains 10k features
+extracted from 650k happy and 650k sad examples.
