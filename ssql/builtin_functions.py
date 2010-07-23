@@ -3,7 +3,6 @@
 from ssql.field_descriptor import ReturnType
 from ssql.function_registry import FunctionInformation
 from ssql.function_registry import FunctionRegistry
-from ssql.extras.sentiment.analysis import word_feats, words_in_tweet
 from geopy import geocoders
 from ordereddict import OrderedDict
 from threading import RLock
@@ -54,6 +53,7 @@ class Sentiment:
     
     @staticmethod
     def factory():
+	from ssql.extras.sentiment.analysis import word_feats, words_in_tweet
         if Sentiment.classifier == None:
             fname = os.path.join(os.path.dirname(ssql.extras.sentiment.__file__), 'sentiment.pkl.gz')
             fp = gzip.open(fname)
