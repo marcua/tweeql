@@ -14,7 +14,6 @@ import re
 import os
 import pickle
 import sys
-import ssql.extras.sentiment
 
 class Temperature():
     fahr = re.compile(ur"(^| )(\-?\d+([.,]\d+)?)\s*\u00B0?(F$|F |Fahr)", re.UNICODE)
@@ -53,8 +52,12 @@ class Sentiment:
     
     @staticmethod
     def factory():
-	from ssql.extras.sentiment.analysis import word_feats, words_in_tweet
         if Sentiment.classifier == None:
+            # Only import analysis if we have to: this means people who
+            # don't use sentiment analysis don't have to install nltk.
+            import ssql.extras.sentiment
+            import ssql.extras.sentiment.analysis
+            Sentiment.analysis = ssql.extras.sentiment.analysis
             fname = os.path.join(os.path.dirname(ssql.extras.sentiment.__file__), 'sentiment.pkl.gz')
             fp = gzip.open(fname)
             classifier_dict = pickle.load(fp)
@@ -70,7 +73,9 @@ class Sentiment:
         return Sentiment().sentiment
 
     def sentiment(self, tuple_data, text):
-        dist = Sentiment.classifier.prob_classify(word_feats(words_in_tweet(text)))
+        words = Sentiment.analysis.words_in_tweet(text)
+        features = Sentiment.analysis.word_feats(words)
+        dist = Sentiment.classifier.prob_classify(features)
         retval = 0
         maxlabel = dist.max()
         classinfo = Sentiment.classinfo[maxlabel]
