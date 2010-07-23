@@ -9,3 +9,4 @@ tweepy---Twitter API
 pyparsing---For the SSQL parsing
 sqlalchemy---For putting results into a relational database
 ordereddict---For creating an LRU cache of keys (geoloc cache)
+geopy---For geolocation
