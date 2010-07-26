@@ -14,6 +14,9 @@ def twitter_user_data_extractor(field):
 class TwitterFields:
     TEXT = "text"
     USER = "user"
+    SSQL_USER_ID = "user_id"
+    TWITTER_USER_ID = "id"
+    SCREEN_NAME = "screen_name"
     LOCATION = "location"
     LANG = "lang"
     CREATED_AT = "created_at"
@@ -26,6 +29,8 @@ def twitter_tuple_descriptor():
         FieldDescriptor(TwitterFields.LOCATION, [], FieldType.FUNCTION, ReturnType.STRING, None, twitter_user_data_extractor(TwitterFields.LOCATION)),
         FieldDescriptor(TwitterFields.LANG, [], FieldType.FUNCTION, ReturnType.STRING, None, twitter_user_data_extractor(TwitterFields.LANG)),
         FieldDescriptor(TwitterFields.PROFILE_IMAGE_URL, [], FieldType.FUNCTION, ReturnType.STRING, None, twitter_user_data_extractor(TwitterFields.PROFILE_IMAGE_URL)),
+        FieldDescriptor(TwitterFields.SSQL_USER_ID, [], FieldType.FUNCTION, ReturnType.INTEGER, None, twitter_user_data_extractor(TwitterFields.TWITTER_USER_ID)),
+        FieldDescriptor(TwitterFields.SCREEN_NAME, [], FieldType.FUNCTION, ReturnType.STRING, None, twitter_user_data_extractor(TwitterFields.SCREEN_NAME)),
         FieldDescriptor(TwitterFields.CREATED_AT, [TwitterFields.CREATED_AT], FieldType.FIELD, ReturnType.DATETIME)
     ]
     return TupleDescriptor(fields)
