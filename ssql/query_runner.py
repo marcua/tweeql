@@ -48,7 +48,8 @@ class QueryRunner(StreamListener):
         elif self.query.source == StatusSource.TWITTER_SAMPLE:
             self.stream.sample(None, async)
     def run_query(self, query_str, async):
-        query_str = unicode(query_str, 'utf-8')
+        if isinstance(query_str, str):
+            query_str = unicode(query_str, 'utf-8')
         query_built = self.query_builder.build(query_str)
         self.run_built_query(query_built, async)
     def stop_query(self):
