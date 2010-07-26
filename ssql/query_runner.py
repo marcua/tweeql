@@ -1,4 +1,5 @@
 from getpass import getpass
+from ssql.builtin_functions import register_default_functions
 from ssql.exceptions import QueryException
 from ssql.exceptions import DbException
 from ssql.operators import StatusSource
@@ -13,6 +14,7 @@ import settings
 
 class QueryRunner(StreamListener):
     def __init__(self):
+        register_default_functions()
         StreamListener.__init__(self)
         try:
             username = settings.TWITTER_USERNAME
