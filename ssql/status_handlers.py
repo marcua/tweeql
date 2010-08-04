@@ -2,7 +2,7 @@ from ssql.exceptions import DbException
 from ssql.field_descriptor import ReturnType
 from ssql.exceptions import SettingsException
 from sqlalchemy import create_engine, Table, Column, Integer, Unicode, Float, DateTime, MetaData
-from sqlalchemy.exc import ArgumentError
+from sqlalchemy.exc import ArgumentError, InterfaceError
 
 import settings
 
@@ -30,7 +30,15 @@ class DbInsertStatusHandler(StatusHandler):
         super(DbInsertStatusHandler, self).__init__(batch_size)
         try:
             self.dburi = settings.DATABASE_URI
-            self.engine = create_engine(self.dburi, echo=False)
+            self.dbconfig = None
+            try:
+                self.dbconfig = settings.DATABASE_CONFIG
+            except AttributeError:
+                pass
+            if self.dbconfig == None:
+                self.engine = create_engine(self.dburi, echo=False)
+            else:
+                self.engine = create_engine(self.dburi, connect_args=self.dbconfig, echo=False)
         except AttributeError:
             raise SettingsException("To put results INTO a TABLE, please specify a DATABASE_URI in private_settings.py") 
         except ArgumentError, e:
@@ -47,7 +55,12 @@ class DbInsertStatusHandler(StatusHandler):
                 columns.append(self.db_col(alias, descriptor))
         columns.insert(0, Column('__id', Integer, primary_key=True))
         self.table = Table(self.tablename, metadata, *columns)
-        metadata.create_all(bind=self.engine)
+        try:
+            metadata.create_all(bind=self.engine)
+        except InterfaceError:
+            raise SettingsException("Unable to connect to database.  Did you configure the connection properly?  Check DATABASE_URI and DATABASE_CONFIG in private_settings.py") 
+
+
         test = metadata.tables[self.tablename]
         self.verify_table()
    
