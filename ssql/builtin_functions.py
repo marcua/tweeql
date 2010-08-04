@@ -49,9 +49,11 @@ class Sentiment:
     classifier = None
     classinfo = None
     return_type = ReturnType.FLOAT
+    constructor_lock = RLock()
     
     @staticmethod
     def factory():
+        Sentiment.constructor_lock.acquire()
         if Sentiment.classifier == None:
             # Only import analysis if we have to: this means people who
             # don't use sentiment analysis don't have to install nltk.
@@ -70,6 +72,7 @@ class Sentiment:
                                       { 'cutoff': classifier_dict['neg_cutoff'],
                                         'value': -1.0/classifier_dict['neg_recall'] }
                                   }
+        Sentiment.constructor_lock.release()
         return Sentiment().sentiment
 
     def sentiment(self, tuple_data, text):
