@@ -11,29 +11,36 @@ from tweepy import StreamListener
 from tweepy import Stream
 
 import settings
+import time
 
 class QueryRunner(StreamListener):
     def __init__(self):
         register_default_functions()
         StreamListener.__init__(self)
         try:
-            username = settings.TWITTER_USERNAME
-            password = settings.TWITTER_PASSWORD
+            self.username = settings.TWITTER_USERNAME
+            self.password = settings.TWITTER_PASSWORD
         except AttributeError:
             print "TWITTER_USERNAME and TWITTER_PASSWORD not defined in private_settings.py"
-            username = raw_input('Twitter username: ')
-            password = getpass('Twitter password: ')
+            self.username = raw_input('Twitter username: ')
+            self.password = getpass('Twitter password: ')
         self.status_lock = RLock()
         self.statuses = []
         self.query_builder = gen_query_builder()
-        self.stream = Stream(username,
-                             password,
+        self.stream = None
+    def build_stream(self):
+        if self.stream != None:
+            self.stop_query()
+            time.sleep(.01) # make sure old stream has time to disconnect
+        self.stream = Stream(self.username,
+                             self.password,
                              self, # this object implements StreamListener
                              timeout = 600, # reconnect if no messages in 600s
                              retry_count = 20, # try reconnecting 20 times
                              retry_time = 10.0, # wait 10s if no HTTP 200
                              snooze_time = 1.0) # wait 1s if timeout in 600s
     def run_built_query(self, query_built, async):
+        self.build_stream()
         self.query = query_built
         self.query.handler.set_tuple_descriptor(self.query.get_tuple_descriptor())
         if self.query.source == StatusSource.TWITTER_FILTER:
@@ -53,8 +60,9 @@ class QueryRunner(StreamListener):
         query_built = self.query_builder.build(query_str)
         self.run_built_query(query_built, async)
     def stop_query(self):
-        self.stream.disconnect()
-        self.flush_statuses()
+        if self.stream != None:
+            self.stream.disconnect()
+            self.flush_statuses()
     def filter_statuses(self, statuses, query):
         (passes, fails) = query.query_tree.filter(statuses, True, False)
         query.handler.handle_statuses(passes)
