@@ -129,19 +129,18 @@ class Stream(object):
 
     def _read_loop(self, resp):
         data = ''
-        while self.running:
-            if resp.isclosed():
-                break
-
+        while self.running and (not resp.isclosed()):
             # read length
             length = ''
-            while True:
+            length_done = False
+            while self.running and (not resp.isclosed()):
                 c = resp.read(1)
                 if c == '\n':
+                    length_done = True
                     break
                 length += c
             length = length.strip()
-            if length.isdigit():
+            if length_done and length.isdigit():
                 length = int(length)
             else:
                 continue
