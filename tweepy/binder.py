@@ -67,6 +67,8 @@ def bind_api(**config):
         def build_parameters(self, args, kargs):
             self.parameters = {}
             for idx, arg in enumerate(args):
+                if arg is None:
+                    continue
 
                 try:
                     self.parameters[self.allowed_param[idx]] = convert_to_utf8_str(arg)
@@ -85,7 +87,8 @@ def bind_api(**config):
             for variable in re_path_template.findall(self.path):
                 name = variable.strip('{}')
 
-                if name == 'user' and self.api.auth:
+                if name == 'user' and 'user' not in self.parameters and self.api.auth:
+                    # No 'user' parameter provided, fetch it from Auth instead.
                     value = self.api.auth.get_username()
                 else:
                     try:
@@ -139,7 +142,7 @@ def bind_api(**config):
                     conn.request(self.method, url, headers=self.headers, body=self.post_data)
                     resp = conn.getresponse()
                 except Exception, e:
-                    raise TweepError('Failed to send request: %s' % e, resp)
+                    raise TweepError('Failed to send request: %s' % e)
 
                 # Exit request loop if non-retry error code
                 if self.retry_errors:

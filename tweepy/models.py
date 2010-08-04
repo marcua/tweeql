@@ -19,7 +19,10 @@ class Model(object):
     def __getstate__(self):
         # pickle
         pickle = dict(self.__dict__)
-        del pickle['_api']  # do not pickle the API reference
+        try:
+            del pickle['_api']  # do not pickle the API reference
+        except KeyError:
+            pass
         return pickle
 
     @classmethod
@@ -54,6 +57,7 @@ class Status(Model):
                     setattr(status, 'source_url', parse_a_href(v))
                 else:
                     setattr(status, k, v)
+                    setattr(status, 'source_url', None)
             elif k == 'retweeted_status':
                 setattr(status, k, Status.parse(api, v))
             else:

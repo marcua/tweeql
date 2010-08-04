@@ -30,7 +30,7 @@ class StreamListener(object):
         Override this method if you wish to manually handle
         the stream data. Return False to stop stream and close connection.
         """
-        
+
         if 'in_reply_to_status_id' in data:
             status = Status.parse(self.api, json.loads(data))
             if self.on_status(status) is False:
@@ -89,6 +89,7 @@ class Stream(object):
         # enter loop
         error_counter = 0
         conn = None
+        exception = None
         while self.running:
             if self.retry_count and error_counter > self.retry_count:
                 # quit if error count greater than retry count
@@ -114,7 +115,7 @@ class Stream(object):
                     break
                 conn.close()
                 sleep(self.snooze_time)
-            except Exception:
+            except Exception, exception:
                 # any other exception is fatal, so kill loop
                 break
 
@@ -122,6 +123,9 @@ class Stream(object):
         self.running = False
         if conn:
             conn.close()
+
+        if exception:
+            raise exception
 
     def _read_loop(self, resp):
         data = ''
