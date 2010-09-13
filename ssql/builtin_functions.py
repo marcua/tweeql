@@ -151,7 +151,7 @@ class Location:
                     latlng = Location.geonames_latlng(loc)
                 Location.cache_lock.acquire()
                 Location.cache[loc] = latlng
-                Location.cache.compact_to_size(5000)
+                Location.cache.compact_to_size(10000)
                 Location.cache_lock.release()
         return latlng
 
