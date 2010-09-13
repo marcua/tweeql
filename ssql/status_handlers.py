@@ -26,23 +26,27 @@ class PrintStatusHandler(StatusHandler):
             print self.delimiter.join(vals)
 
 class DbInsertStatusHandler(StatusHandler):
+    engine = None
+
     def __init__(self, batch_size, tablename):
         super(DbInsertStatusHandler, self).__init__(batch_size)
-        try:
-            self.dburi = settings.DATABASE_URI
-            self.dbconfig = None
+        if DbInsertStatusHandler.engine == None:
             try:
-                self.dbconfig = settings.DATABASE_CONFIG
-            except AttributeError:
-                pass
-            if self.dbconfig == None:
-                self.engine = create_engine(self.dburi, echo=False)
-            else:
-                self.engine = create_engine(self.dburi, connect_args=self.dbconfig, echo=False)
-        except AttributeError:
-            raise SettingsException("To put results INTO a TABLE, please specify a DATABASE_URI in private_settings.py") 
-        except ArgumentError, e:
-            raise DbException(e)
+                dburi = settings.DATABASE_URI
+                dbconfig = None
+                try:
+                    dbconfig = settings.DATABASE_CONFIG
+                except AttributeError:
+                    pass
+                if dbconfig == None:
+                    DbInsertStatusHandler.engine = create_engine(dburi, echo=False, pool_size=1, max_overflow=1)
+                else:
+                    DbInsertStatusHandler.engine = create_engine(dburi, connect_args=dbconfig, echo=False, pool_size=1, max_overflow=1)
+            except AttributeError, e:
+                raise e
+                raise SettingsException("To put results INTO a TABLE, please specify a DATABASE_URI in private_settings.py") 
+            except ArgumentError, e:
+                raise DbException(e)
         self.tablename = tablename
 
     def set_tuple_descriptor(self, descriptor):
@@ -56,7 +60,7 @@ class DbInsertStatusHandler(StatusHandler):
         columns.insert(0, Column('__id', Integer, primary_key=True))
         self.table = Table(self.tablename, metadata, *columns)
         try:
-            metadata.create_all(bind=self.engine)
+            metadata.create_all(bind=DbInsertStatusHandler.engine)
         except InterfaceError:
             raise SettingsException("Unable to connect to database.  Did you configure the connection properly?  Check DATABASE_URI and DATABASE_CONFIG in private_settings.py") 
 
@@ -86,14 +90,18 @@ class DbInsertStatusHandler(StatusHandler):
             exists and has a different schema.
         """
         metadata = MetaData()
-        metadata.reflect(bind = self.engine)
+        metadata.reflect(bind = DbInsertStatusHandler.engine)
         mine = str(self.table.columns)
         verified = str(metadata.tables[self.tablename].columns)
         if mine != verified:
             raise DbException("Table '%s' in the database has schema %s whereas the query's schema is %s" % (self.tablename, verified, mine)) 
  
     def handle_statuses(self, statuses):
-        conn = self.engine.connect()
+        #from datetime import datetime
+        #now = datetime.now()
+        #print "handle called ", now 
         dicts = [dict(status.as_iterable_visible_pairs()) for status in statuses]
+        conn = DbInsertStatusHandler.engine.connect()
         conn.execute(self.table.insert(), dicts)
         conn.close()
+        #print "handle started ", now, " ended ", datetime.now()
