@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import datetime, timedelta
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse
@@ -56,12 +56,14 @@ def generate_style(hexa,id,linewidth):
     return style
 
 def generate_placemarks_kml(temperature_table, db_conn):
-    yesterday = date.today()-timedelta(hours=24)
+    yesterday = datetime.today()-timedelta(hours=48)
     where_clause = and_(temperature_table.c.latitude != None,
                         temperature_table.c.longitude != None, 
                         temperature_table.c.temperature != None,
                         temperature_table.c.temperature > 0.0,
                         temperature_table.c.temperature < 120.0, 
+                        temperature_table.c.meandevs < 2, 
+                        temperature_table.c.meandevs > 0, 
                         temperature_table.c.created_at > yesterday)
     latcol = cast(temperature_table.c.latitude, Integer).label('latitude')
     longcol = cast(temperature_table.c.longitude, Integer).label('longitude')
@@ -153,10 +155,10 @@ def end_kml():
     <name>Absolute Positioning: Top left</name>
     <visibility>1</visibility>
     <Icon>
-      <href>http://kml-samples.googlecode.com/svn/trunk/resources/top_left.jpg</href>
+      <href>http://web.mit.edu/badar/www/temperatures.png</href>
     </Icon>
-    <overlayXY x=".95" y=".8" xunits="fraction" yunits="fraction"/>
-    <screenXY x=".95" y=".8" xunits="fraction" yunits="fraction"/>
+    <overlayXY x=".95" y=".1" xunits="fraction" yunits="fraction"/>
+    <screenXY x=".95" y=".1" xunits="fraction" yunits="fraction"/>
     <rotationXY x="0" y="0" xunits="fraction" yunits="fraction"/>
     <size x="0" y="0" xunits="fraction" yunits="fraction"/>
   </ScreenOverlay>
@@ -168,7 +170,7 @@ def generate_weather_kml():
     engine = create_engine(DB_URI, echo=True)
     meta = MetaData()
     meta.reflect(bind=engine)
-    temperature = meta.tables['tester2']
+    temperature = meta.tables['weather_meandev']
     conn = engine.connect()
     
     kml_body = [begin_kml(),generate_style_kml(),generate_placemarks_kml(temperature, conn), end_kml()]
