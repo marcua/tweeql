@@ -1,21 +1,21 @@
 from itertools import chain
 from pyparsing import ParseException
-from ssql import operators
-from ssql.aggregation import get_aggregate_factory
-from ssql.operators import StatusSource
-from ssql.exceptions import QueryException
-from ssql.exceptions import DbException
-from ssql.field_descriptor import FieldDescriptor
-from ssql.field_descriptor import FieldType
-from ssql.field_descriptor import ReturnType
-from ssql.function_registry import FunctionRegistry
-from ssql.query import Query
-from ssql.query import QueryTokens
-from ssql.ssql_parser import gen_parser
-from ssql.status_handlers import PrintStatusHandler
-from ssql.status_handlers import DbInsertStatusHandler
-from ssql.tuple_descriptor import TupleDescriptor
-from ssql.twitter_fields import twitter_tuple_descriptor
+from tweeql import operators
+from tweeql.aggregation import get_aggregate_factory
+from tweeql.operators import StatusSource
+from tweeql.exceptions import QueryException
+from tweeql.exceptions import DbException
+from tweeql.field_descriptor import FieldDescriptor
+from tweeql.field_descriptor import FieldType
+from tweeql.field_descriptor import ReturnType
+from tweeql.function_registry import FunctionRegistry
+from tweeql.query import Query
+from tweeql.query import QueryTokens
+from tweeql.tweeql_parser import gen_parser
+from tweeql.status_handlers import PrintStatusHandler
+from tweeql.status_handlers import DbInsertStatusHandler
+from tweeql.tuple_descriptor import TupleDescriptor
+from tweeql.twitter_fields import twitter_tuple_descriptor
 
 def gen_query_builder():
     return QueryBuilder()

@@ -4,7 +4,7 @@
 from pyparsing import Literal, CaselessLiteral, Word, upcaseTokens, delimitedList, Optional, \
     Combine, Group, alphas, nums, alphanums, ParseException, Forward, oneOf, quotedString, \
     ZeroOrMore, restOfLine, Keyword, removeQuotes, downcaseTokens
-from ssql.query import QueryTokens
+from tweeql.query import QueryTokens
 
 def gen_parser():
     # define SQL tokens

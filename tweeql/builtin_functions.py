@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from ssql.field_descriptor import ReturnType
-from ssql.function_registry import FunctionInformation
-from ssql.function_registry import FunctionRegistry
+from tweeql.field_descriptor import ReturnType
+from tweeql.function_registry import FunctionInformation
+from tweeql.function_registry import FunctionRegistry
 from geopy import geocoders
 from ordereddict import OrderedDict
 from threading import RLock
@@ -57,10 +57,10 @@ class Sentiment:
         if Sentiment.classifier == None:
             # Only import analysis if we have to: this means people who
             # don't use sentiment analysis don't have to install nltk.
-            import ssql.extras.sentiment
-            import ssql.extras.sentiment.analysis
-            Sentiment.analysis = ssql.extras.sentiment.analysis
-            fname = os.path.join(os.path.dirname(ssql.extras.sentiment.__file__), 'sentiment.pkl.gz')
+            import tweeql.extras.sentiment
+            import tweeql.extras.sentiment.analysis
+            Sentiment.analysis = tweeql.extras.sentiment.analysis
+            fname = os.path.join(os.path.dirname(tweeql.extras.sentiment.__file__), 'sentiment.pkl.gz')
             fp = gzip.open(fname)
             classifier_dict = pickle.load(fp)
             fp.close()

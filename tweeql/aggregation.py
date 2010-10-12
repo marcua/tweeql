@@ -1,7 +1,7 @@
 from datetime import timedelta
 from datetime import datetime
-from ssql.query import QueryTokens 
-from ssql.exceptions import QueryException
+from tweeql.query import QueryTokens 
+from tweeql.exceptions import QueryException
 from threading import RLock
 
 class Aggregator():

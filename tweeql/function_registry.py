@@ -1,4 +1,4 @@
-from ssql.exceptions import QueryException
+from tweeql.exceptions import QueryException
 
 class FunctionInformation():
     def __init__(self, func_factory, return_type):

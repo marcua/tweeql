@@ -1,6 +1,6 @@
-from ssql.exceptions import DbException
-from ssql.field_descriptor import ReturnType
-from ssql.exceptions import SettingsException
+from tweeql.exceptions import DbException
+from tweeql.field_descriptor import ReturnType
+from tweeql.exceptions import SettingsException
 from sqlalchemy import create_engine, Table, Column, Integer, Unicode, Float, DateTime, MetaData
 from sqlalchemy.exc import ArgumentError, InterfaceError
 

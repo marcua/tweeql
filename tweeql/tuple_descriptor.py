@@ -2,7 +2,7 @@ import copy
 from field_descriptor import FieldDescriptor
 from field_descriptor import FieldType
 from field_descriptor import ReturnType
-from ssql.exceptions import QueryException
+from tweeql.exceptions import QueryException
 
 class Tuple():
     def __init__(self):
