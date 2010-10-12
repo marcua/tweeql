@@ -4,4 +4,4 @@ private_settings.py
 *.db
 build/
 dist/
-tweepy.egg-info/
+tweeql.egg-info/
