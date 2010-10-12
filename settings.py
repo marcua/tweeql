@@ -1,7 +1,7 @@
 from private_settings import *
 
 # Running in debug mode, the system prints a lot more information
-DEBUG = True
+DEBUG = False
 
 REDIS_HOSTNAME = 'localhost'
 REDIS_PORT = 6379
