@@ -7,11 +7,11 @@ expressed user sentiment from the text of every tweet that passes through
 the Twitter Streaming API.
 
 LICENSE
--------
+=======
 BSD license
 
 Projects on which TweeQL Depends
---------------------------------
+================================
 tweepy---Twitter API
 pyparsing---For the SSQL parsing
 sqlalchemy---For putting results into a relational database
