@@ -1,6 +1,7 @@
 *~
 *.pyc
 private_settings.py
+settings.py
 *.db
 build/
 dist/
