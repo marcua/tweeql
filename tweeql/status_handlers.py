@@ -4,7 +4,12 @@ from tweeql.exceptions import SettingsException
 from sqlalchemy import create_engine, Table, Column, Integer, Unicode, Float, DateTime, MetaData
 from sqlalchemy.exc import ArgumentError, InterfaceError
 
-import settings
+import sys
+try:
+    import settings
+except ImportError, e:
+    print "It looks like you don't have a settings.py with basic project settings."
+    sys.exit(-1)
 
 class StatusHandler(object):
     def __init__(self, batch_size):
