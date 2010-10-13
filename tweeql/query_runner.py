@@ -21,7 +21,7 @@ class QueryRunner(StreamListener):
             self.username = settings.TWITTER_USERNAME
             self.password = settings.TWITTER_PASSWORD
         except AttributeError:
-            print "TWITTER_USERNAME and TWITTER_PASSWORD not defined in private_settings.py"
+            print "TWITTER_USERNAME and TWITTER_PASSWORD not defined in settings.py"
             self.username = raw_input('Twitter username: ')
             self.password = getpass('Twitter password: ')
         self.status_lock = RLock()

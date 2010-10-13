@@ -1,15 +1,25 @@
-from private_settings import *
+# Twitter authentication information
+#TWITTER_USERNAME = ""
+#TWITTER_PASSWORD = ""
+
+# set to a database URI according to sqlalchemy's scheme for the database to dump stored tweets into
+DATABASE_URI = "sqlite:///test.db"
+# to send parameters to the connection argument, set the DATABASE_URI to
+# the database protocol you want (e.g. "postgresql://") and then uncomment
+# and fill in the following DATABASE_CONFIG
+#
+#DATABASE_CONFIG = {
+#    'database':'',
+#    'host':'',
+#    'user':'',
+#    'password':''
+#}
 
 # Running in debug mode, the system prints a lot more information
 DEBUG = False
 
-REDIS_HOSTNAME = 'localhost'
-REDIS_PORT = 6379
-REDIS_DB = 0
-
-POLL_TIME = .25 # seconds between looking for new content in redis
-MAX_MESSAGES = 10000
-
-TWEET_GROUP_ID = 'tweet-group-id'
-TO_INDEX = 'tweet-groups-to-index'
-CONSUMED_INDICES = 'tweet-groups-consumed'
+# set to a database URI according to sqlalchemy's scheme for the database to allow 
+# various operators use as scratch space
+SCRATCHSPACE_URI = "sqlite:///scratch.db"
+# what prefix should tables used for scratchspace get
+SCRATCHSPACE_PREFIX = "tweeql_scratch__"

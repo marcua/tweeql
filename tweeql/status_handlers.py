@@ -39,12 +39,12 @@ class DbInsertStatusHandler(StatusHandler):
                 except AttributeError:
                     pass
                 if dbconfig == None:
-                    DbInsertStatusHandler.engine = create_engine(dburi, echo=False, pool_size=1, max_overflow=1)
+                    DbInsertStatusHandler.engine = create_engine(dburi, echo=False, pool_size=1)
                 else:
-                    DbInsertStatusHandler.engine = create_engine(dburi, connect_args=dbconfig, echo=False, pool_size=1, max_overflow=1)
+                    DbInsertStatusHandler.engine = create_engine(dburi, connect_args=dbconfig, echo=False, pool_size=1)
             except AttributeError, e:
                 raise e
-                raise SettingsException("To put results INTO a TABLE, please specify a DATABASE_URI in private_settings.py") 
+                raise SettingsException("To put results INTO a TABLE, please specify a DATABASE_URI in settings.py") 
             except ArgumentError, e:
                 raise DbException(e)
         self.tablename = tablename
@@ -62,7 +62,7 @@ class DbInsertStatusHandler(StatusHandler):
         try:
             metadata.create_all(bind=DbInsertStatusHandler.engine)
         except InterfaceError:
-            raise SettingsException("Unable to connect to database.  Did you configure the connection properly?  Check DATABASE_URI and DATABASE_CONFIG in private_settings.py") 
+            raise SettingsException("Unable to connect to database.  Did you configure the connection properly?  Check DATABASE_URI and DATABASE_CONFIG in settings.py") 
 
 
         test = metadata.tables[self.tablename]
