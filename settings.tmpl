@@ -15,8 +15,11 @@ DATABASE_URI = "sqlite:///test.db"
 #    'password':''
 #}
 
+# Running in debug mode, the system prints a lot more information
+DEBUG = False
+
 # set to a database URI according to sqlalchemy's scheme for the database to allow 
 # various operators use as scratch space
-SCRATCHSPACE_URI = ""
+SCRATCHSPACE_URI = "sqlite:///scratch.db"
 # what prefix should tables used for scratchspace get
 SCRATCHSPACE_PREFIX = "tweeql_scratch__"
