@@ -46,6 +46,8 @@ These should stream by your screen relatively quickly.  Hit `ctrl+c` to stop the
 
 Queries by Example
 ==================
+Now we'll walk through example queries to teach you the TweeQL syntax.  Check out (http://github.com/marcua/tweeql/blob/master/examples/examples.txt) for a longer list of example queries that you can run in TweeQL.
+
 SELECT FROM WHERE GROUP BY WINDOW
 ---------------------------------
 TweeQL borrows its query syntax from SQL, and so queries are of the form 
@@ -87,9 +89,11 @@ You can define your own functions as well.  To learn how, read the *User-Defined
 
 Aggregate Queries
 -----------------
+TweeQL provides SQL-like aggregates (`AVG`, `COUNT`, `SUM`, `MIN`, and `MAX`).  Since these functions are operating on a stream, TweeQL also provides a WINDOW keyword, which allows you to set the time window over which to calculate the aggregate values before emitting them.  For example:
 
+    SELECT location, COUNT(text) AS tweets FROM TWITTER_SAMPLE GROUP BY location WINDOW 120 seconds;
 
-Finally, check out (http://github.com/marcua/tweeql/blob/master/examples/examples.txt) for a list of example queries that you can run in TweeQL.
+would return the location and number of tweets at that location on the gardenhose every 120 seconds.
 
 Saving Tweets to a Database
 ===========================
