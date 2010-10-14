@@ -39,17 +39,53 @@ To see Tweets from the Twitter's gardenhose, type `SELECT text FROM twitter_samp
 
     tweeql> SELECT text from twitter_sample;
     não sei realmente o que decidir da minha vida.. muito confusa. :S
-    伝線した黒ストッキングの使い道は…`
+    伝線した黒ストッキングの使い道は…
+    ...
 
 These should stream by your screen relatively quickly.  Hit `ctrl+c` to stop the query.  To exit TweeQL, hit `ctrl+c` again.
 
 Queries by Example
 ==================
+SELECT FROM WHERE GROUP BY WINDOW
+---------------------------------
+TweeQL borrows its query syntax from SQL, and so queries are of the form 
+
+    SELECT field1, field2 FROM streams WHERE filter_conditions GROUP BY field3, field4 WINDOW x seconds
+
+These keywords work just like in SQL, except for the WINDOW key word, which applies to GROUP BY.  Because Twitter offers an infinite stream of data, aggregates which use GROUP BY would never emit any groups.  `WINDOW x seconds` tells TweeQL to emit the aggregates in the GROUP BY statement every x seconds, thus providing a rolling window over which to calculate groups.
+
 TWITTER vs. TWITTER_SAMPLE
 --------------------------
-In the last
+Our first TweeQL query was `SELECT text from twitter_sample;`.  `TWITTER_SAMPLE` is a stream known in the Twitter API as the gardenhose: it is a sample of tweets that constitutes approximately 5% of Twitter's firehose.  You can issue queries to `TWITTER_SAMPLE` without any filter conditions, though you are free to filter this stream.
 
-Finally, check out [http://github.com/marcua/tweeql/blob/master/examples/examples.txt] for a list of example queries that you can run in TweeQL.
+If you wish to access more than a sample of the tweets on the stream, you have to query `TWITTER` rather than `TWITTER_SAMPLE`.  To avoid excessive costs, Twitter requires that you issue at least one filter condition along with your query.  For example, you can get all tweet text for tweets that contain the word 'obama' by issuing the following query
+
+    SELECT text FROM twitter WHERE text contains 'obama';
+
+You can also filter the results by tracking individual users or by querying geographic regions, though this is not currently implemented in TweeQL at the moment (e-mail me if this is important to you).
+
+Fields
+------
+Tweets have several fields which one can filter, select, or aggregate across.  The fields are currently `text` (tweet text), `location` (user-defined location, like 'Boston' or 'France, Earth'), `lang` (user-specified language), `profile_image_url` (the URL of the user's profile image), `user_id` (the user's Twitter userid), `screen_name` (the user's username), and `created_at` (the time of the tweet).  You can add more by editing `tweeql/twitter_fields.py`.
+
+Fields can appear in SELECT, WHERE, or GROUP BY clauses, and can be separated by commas.  To add to our last query, we might want to find the username, tweet time, and tweet text of all tweets containing the text 'obama' and have a non-NULL location:
+
+    SELECT screen_name, created_at, text FROM twitter WHERE text contains 'obama' AND location != NULL;
+
+Functions
+---------
+Tweets are hardly data on their own.  Most meaningful uses of the tweet stream will require some finessing of the data that comes from the stream.  As such, you can run functions that infer information or derive structure from the various fields that TweeQL offers by default.  These functions can appear anywhere a field appears in a query.  The functions that come with TweeQL are
+
+ * 
+
+You can define your own functions as well.  To learn how, read the *User-Defined Functions* section below.
+
+
+Aggregate Queries
+-----------------
+
+
+Finally, check out (http://github.com/marcua/tweeql/blob/master/examples/examples.txt) for a list of example queries that you can run in TweeQL.
 
 Saving Tweets to a Database
 ===========================
@@ -58,7 +94,7 @@ Programmatic Access
 ===================
 Working from the TweeQL command-line is a good way to get started, but you might want to issue TweeQL queries programmatically.
 
-Here's a simple code sample to get started from, also available at [http://github.com/marcua/tweeql/blob/master/examples/tweeql-programmatic.py]:
+Here's a simple code sample to get started from, also available at (http://github.com/marcua/tweeql/blob/master/examples/tweeql-programmatic.py):
 
     from tweeql.exceptions import TweeQLException
     from tweeql.query_runner import QueryRunner
@@ -70,7 +106,7 @@ That's it!  `QueryRunner.run_query` takes a TweeQL query and executes it.  The s
 
 User-Defined Functions (UDFs)
 =============================
-The examples we have shown have used several user-defined functions (`sentiment`, `tweetLatLng`, etc.).  If you wish to write your own UDF, you can do so in python.  The following example, in which we count the length of tweets on the gardenhose, can be found at [http://github.com/marcua/tweeql/blob/master/examples/tweeql-udf.py]:
+The examples we have shown have used several user-defined functions (`sentiment`, `tweetLatLng`, etc.).  If you wish to write your own UDF, you can do so in python.  The following example, in which we count the length of tweets on the gardenhose, can be found at (http://github.com/marcua/tweeql/blob/master/examples/tweeql-udf.py):
 
     from tweeql.exceptions import TweeQLException
     from tweeql.field_descriptor import ReturnType
@@ -102,7 +138,7 @@ You can include any number of arguments after `tuple_data`.  In our case, we onl
 
 After we have defined our UDF in `StringLength`, we then register the function.  To do this, we create a `FunctionRegistry`, which is a singleton, and register the function to the TweeQL `stringlength` function.  You can see the `stringlength` function in action on the last line of this example: it's a first-class citizen in our queries now!
 
-To see more UDFs, take a look at http://github.com/marcua/tweeql/blob/master/tweeql/builtin_functions.py.
+To see more UDFs, take a look at (http://github.com/marcua/tweeql/blob/master/tweeql/builtin_functions.py).
 
 Projects on which TweeQL Depends
 ================================
