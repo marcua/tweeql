@@ -85,6 +85,19 @@ class Sentiment:
         if dist.prob(maxlabel) > classinfo['cutoff']:
             retval = classinfo['value']
         return retval
+
+class StringLength():
+    return_type = ReturnType.INTEGER
+
+    @staticmethod
+    def factory():
+        return StringLength().strlen
+
+    def strlen(self, tuple_data, val):
+        """ 
+            Returns the length of val, which is a string
+        """
+        return len(val)
          
 class Rounding():
     return_type = ReturnType.FLOAT
@@ -250,6 +263,7 @@ def register_default_functions():
     fr.register("temperatureF", FunctionInformation(Temperature.factory, Temperature.return_type))
     fr.register("tweetLatLng", FunctionInformation(Location.factory, Location.return_type))
     fr.register("floor", FunctionInformation(Rounding.factory, Rounding.return_type))
+    fr.register("strlen", FunctionInformation(StringLength.factory, StringLength.return_type))
     fr.register("meanDevs", FunctionInformation(MeanOutliers.factory, MeanOutliers.return_type))
     fr.register("sentiment", FunctionInformation(Sentiment.factory, Sentiment.return_type))
 
