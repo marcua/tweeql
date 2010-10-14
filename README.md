@@ -16,9 +16,9 @@ There are two options for installing TweeQL:
 Initializing your Settings
 ==========================
 TweeQL requires a `settings.py` to be in your current working directory before
-you can use it.
+you can use it.  The simplest way to get a working `settings.py` file is to get the template into your current directory:
 
-The simplest way to get a working `settings.py` file is to get the template into your current directory:  
+
 `wget http://github.com/marcua/tweeql/raw/master/setting.py.template -O settings.py`
 
 This file should work without editing.  You can edit it to provide a username/password for the streaming API, or to change the database into which extracted data will be inserted.
@@ -27,10 +27,13 @@ A first example
 ===============
 After installing TweeQL, you should be able to run the TweeQL command line by typing `tweeql-command-line.py`:
 
-`TWITTER_USERNAME and TWITTER_PASSWORD not defined in settings.py  
+`  
+marcua@marcua-x60:~$ tweeql-command-line.py  
+TWITTER_USERNAME and TWITTER_PASSWORD not defined in settings.py  
 Twitter username: marcuatest3  
 Twitter password:  
-tweeql>`
+tweeql>  
+`
 
 You can edit `settings.py` to save your username and password.
 
