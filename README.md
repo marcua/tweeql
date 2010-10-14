@@ -49,7 +49,8 @@ TWITTER vs. TWITTER_SAMPLE
 --------------------------
 In the last
 
-Finally, check out http://github.com/marcua/tweeql/blob/master/examples/examples.txt for a list of example queries that you can run in TweeQL.
+Finally, check out [http://github.com/marcua/tweeql/blob/master/examples/examples.txt] for a list of example queries that you can run in TweeQL.
+
 Saving Tweets to a Database
 ===========================
 
@@ -57,7 +58,7 @@ Programmatic Access
 ===================
 Working from the TweeQL command-line is a good way to get started, but you might want to issue TweeQL queries programmatically.
 
-Here's a simple code sample to get started from, also available at http://github.com/marcua/tweeql/blob/master/examples/tweeql-programmatic.py:
+Here's a simple code sample to get started from, also available at [http://github.com/marcua/tweeql/blob/master/examples/tweeql-programmatic.py]:
 
     from tweeql.exceptions import TweeQLException
     from tweeql.query_runner import QueryRunner
@@ -69,7 +70,7 @@ That's it!  `QueryRunner.run_query` takes a TweeQL query and executes it.  The s
 
 User-Defined Functions (UDFs)
 =============================
-The examples we have shown have used several user-defined functions (`sentiment`, `tweetLatLng`, etc.).  If you wish to write your own UDF, you can do so in python.  The following example, in which we count the length of tweets on the gardenhose, can be found at http://github.com/marcua/tweeql/blob/master/examples/tweeql-udf.py:
+The examples we have shown have used several user-defined functions (`sentiment`, `tweetLatLng`, etc.).  If you wish to write your own UDF, you can do so in python.  The following example, in which we count the length of tweets on the gardenhose, can be found at [http://github.com/marcua/tweeql/blob/master/examples/tweeql-udf.py]:
 
     from tweeql.exceptions import TweeQLException
     from tweeql.field_descriptor import ReturnType
@@ -95,7 +96,7 @@ The examples we have shown have used several user-defined functions (`sentiment`
     runner = QueryRunner()
     runner.run_query("SELECT stringlength(text) AS len FROM twitter_sample;", False)
 
-In this example, we build the class `StringLength`, which has two methods: a `factory` method and an `strlen` method.  Stricly speaking, the only method that a UDF requires is a `factory` method---this is the method that returns another method (in this case `stringlength`) which performs the actual computation.  The only requirement for the UDF computation method is that its first argument be `tuple_data`, a dictionary of data that is returned with all tweets (read more about this [here](http://mehack.com/map-of-a-twitter-status-object).
+In this example, we build the class `StringLength`, which has two methods: a `factory` method and an `strlen` method.  Stricly speaking, the only method that a UDF requires is a `factory` method---this is the method that returns another method (in this case `stringlength`) which performs the actual computation.  The only requirement for the UDF computation method is that its first argument be `tuple_data`, a dictionary of data that is returned with all tweets (read more about this [here](http://mehack.com/map-of-a-twitter-status-object)).
 
 You can include any number of arguments after `tuple_data`.  In our case, we only take one: the string `val` which we wish to take the length of.  Note that when we run the query on the last line of this example, we pass `text` as an argument to `stringlength`---this is the value that `val` will take on.
 
