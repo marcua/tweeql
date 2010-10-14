@@ -27,11 +27,11 @@ A first example
 ===============
 After installing TweeQL, you should be able to run the TweeQL command line by typing `tweeql-command-line.py`:
 
-`marcua@marcua-x60:~$ tweeql-command-line.py`  
-`TWITTER_USERNAME and TWITTER_PASSWORD not defined in settings.py`  
-`Twitter username: marcuatest3`  
-`Twitter password:`  
-`tweeql>`
+    marcua@marcua-x60:~$ tweeql-command-line.py
+    TWITTER_USERNAME and TWITTER_PASSWORD not defined in settings.py
+    Twitter username: marcuatest3
+    Twitter password:
+    tweeql>
 
 You can edit `settings.py` to save your username and password.
 
