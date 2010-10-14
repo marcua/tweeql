@@ -267,7 +267,7 @@ class QueryBuilder:
         elif field[0] == QueryTokens.FUNCTION_OR_AGGREGATE: # function or aggregate  
             if alias == None:
                 if alias_on_complex_types:
-                    raise QueryException("Must specify alias (AS clause) for '%s'" % (repr(field)))
+                    raise QueryException("Must specify alias (AS clause) for '%s'" % (field[1]))
                 else:
                     alias = self.unnamed_operator_name()
             underlying_field_list = field[2:]
