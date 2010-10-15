@@ -104,7 +104,7 @@ Aggregate Queries
 -----------------
 TweeQL provides SQL-like aggregates (`AVG`, `COUNT`, `SUM`, `MIN`, and `MAX`).  Since these functions are operating on a stream, TweeQL also provides a WINDOW keyword, which allows you to set the time window over which to calculate the aggregate values before emitting them.  For example:
 
-    SELECT location, COUNT(text) AS tweets FROM TWITTER_SAMPLE GROUP BY location WINDOW 120 seconds;
+    SELECT location, COUNT(text) AS numtweets FROM TWITTER_SAMPLE GROUP BY location WINDOW 120 seconds;
 
 would return the location and number of tweets at that location on the Spritzer stream every 120 seconds.
 
@@ -112,7 +112,7 @@ Programmatic Access
 ===================
 Working from the TweeQL command-line is a good way to get started, but you might want to issue TweeQL queries programmatically.
 
-Here's a simple code sample to get started from, also available at [tweeql-programmatic.py](http://github.com/marcua/tweeql/blob/master/examples/tweeql-programmatic.py):
+Here's a code sample to start with, also available at [tweeql-programmatic.py](http://github.com/marcua/tweeql/blob/master/examples/tweeql-programmatic.py):
 
     from tweeql.exceptions import TweeQLException
     from tweeql.query_runner import QueryRunner
@@ -120,7 +120,7 @@ Here's a simple code sample to get started from, also available at [tweeql-progr
     runner = QueryRunner()
     runner.run_query("SELECT text FROM twitter_sample;", False)
 
-That's it!  `QueryRunner.run_query` takes a TweeQL query and executes it.  The second argument to `run_query` determines whether the query runs asynchronously or not.  In this case, the program blocks on the `run_query` call because the second argument is `False`.  If you run with the second argument as `True`, a new thread will execute the query.  To stop the query programmatically, use `runner.stop_query()`.
+`QueryRunner.run_query` takes a TweeQL query and executes it.  The second argument to `run_query` determines whether the query runs asynchronously or not.  In this case, the program blocks on the `run_query` call because the second argument is `False`.  If you run with the second argument as `True`, a new thread will execute the query.  To stop an asynchronous query programmatically, use `runner.stop_query()`.
 
 User-Defined Functions (UDFs)
 =============================
@@ -150,11 +150,11 @@ The examples we have shown have used several user-defined functions (`sentiment`
     runner = QueryRunner()
     runner.run_query("SELECT stringlength(text) AS len FROM twitter_sample;", False)
 
-In this example, we build the class `StringLength`, which has two methods: a `factory` method and an `strlen` method.  Stricly speaking, the only method that a UDF requires is a `factory` method---this is the method that returns another method (in this case `stringlength`) which performs the actual computation.  The only requirement for the UDF computation method is that its first argument be `tuple_data`, a dictionary of data that is returned with all tweets (read more about this [here](http://mehack.com/map-of-a-twitter-status-object)).
+In this example, we build the class `StringLength`, which has two methods: a `factory` method and an `strlen` method.  Stricly speaking, the only method that a UDF requires is a `factory` method, which returns another method (in this case `strlen`) that performs the actual computation.  The only requirement for the UDF computation method is that its first argument be `tuple_data`, a dictionary of data that is returned with all tweets (read more about this [here](http://mehack.com/map-of-a-twitter-status-object)).
 
 You can include any number of arguments after `tuple_data`.  In our case, we only take one: the string `val` which we wish to take the length of.  Note that when we run the query on the last line of this example, we pass `text` as an argument to `stringlength`---this is the value that `val` will take on.
 
-After we have defined our UDF in `StringLength`, we then register the function.  To do this, we create a `FunctionRegistry`, which is a singleton, and register the function to the TweeQL `stringlength` function.  You can see the `stringlength` function in action on the last line of this example: it's a first-class citizen in our queries now!
+After we have defined our UDF in `StringLength`, we then register the function.  To do this, we create a `FunctionRegistry`, which is a singleton, and register the function as the TweeQL `stringlength` function.  You can see the `stringlength` function in action on the last line of this example: it's a first-class citizen of our queries now!
 
 To see more UDFs, take a look at [builtin_functions.py](http://github.com/marcua/tweeql/blob/master/tweeql/builtin_functions.py).
 
