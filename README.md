@@ -10,6 +10,7 @@ of implementing the API correctly.
 Installation
 ============
 There are two options for installing TweeQL:
+
   1.  *easy_install/pip*.  Something like `sudo easy_install tweeql` or `sudo pip install tweeql` at the command line should suffice.
   1.  *from github*.  After checking out this repository, run `python setup.py install` to install!
 
