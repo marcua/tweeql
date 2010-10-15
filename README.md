@@ -97,6 +97,15 @@ would return the location and number of tweets at that location on the gardenhos
 
 Saving Tweets to a Database
 ===========================
+Printing tweets to your screen might be fun, but it's not always the desired result.  TweeQL provides an `INTO` keyword to faciliate dumping tweets to other locations.  By default (when not specified), TweeQL sends tweets `INTO STDOUT` (the screen).  Alternatively, you can send tweets `INTO TABLE tablename`, which will insert the tweets into a table `tablename`.  For example:
+
+`SELECT screen_name, text FROM twitter INTO TABLE obama_tweets WHERE text contains 'obama';`
+
+If `obama_tweets` does not exist, it will be created with the schema specified by the `SELECT` parameters.  If the table already exists and matches the schema of the `SELECT` parameters, tweets will be appended to that location.  
+
+The database which contains the table is specified in `settings.py` either through the `DATABASE_URI` or `DATABASE_CONFIG` parameters.  By default, a sqlite3 database called `test.db` will be created in your current working directory.  
+
+For performance reasons, TweeQL batches records in groups of 1000 before inserting them into the database.  This means that if you end the query before 1000 records are generated, you will lose those records.  E-mail me if you rely on a more durable solution.
 
 Programmatic Access
 ===================
