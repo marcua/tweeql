@@ -55,11 +55,11 @@ TweeQL borrows its query syntax from SQL, and so queries are of the form
 
     SELECT field1, field2 FROM streams WHERE filter_conditions GROUP BY field3, field4 WINDOW x seconds
 
-These keywords work just like in SQL, except for the WINDOW key word, which applies to GROUP BY.  Because Twitter offers an infinite stream of data, aggregates which use GROUP BY would never emit any groups.  `WINDOW x seconds` tells TweeQL to emit the aggregates in the GROUP BY statement every x seconds, thus providing a rolling window over which to calculate groups.
+These keywords work just like in SQL, except for the WINDOW key word, which applies to GROUP BY.  Because Twitter offers an infinite stream of data, aggregates which use GROUP BY would never emit any groups.  `WINDOW x seconds` tells TweeQL to emit the aggregates in the GROUP BY statement every x seconds, providing a rolling window over which to aggregate groups.
 
 TWITTER vs. TWITTER_SAMPLE
 --------------------------
-Our first TweeQL query was `SELECT text from twitter_sample;`.  `TWITTER_SAMPLE` is a stream known in the Twitter API as the Spritzer stream: it is a sample of tweets that constitutes approximately 5% of Twitter's firehose.  You can issue queries to `TWITTER_SAMPLE` without any filter conditions, though you are free to filter this stream.
+Our first TweeQL query was `SELECT text from twitter_sample;`.  `TWITTER_SAMPLE` is a stream known in the Twitter API as the Spritzer stream: it is a sample of tweets that constitutes approximately 1% of Twitter's firehose.  You can issue queries to `TWITTER_SAMPLE` without any filter conditions, though you are free to further filter this stream.
 
 If you wish to access more than a sample of the tweets on the stream, you have to query `TWITTER` rather than `TWITTER_SAMPLE`.  To avoid excessive costs, Twitter requires that you issue at least one filter condition along with your query.  For example, you can get all tweet text for tweets that contain the word 'obama' by issuing the following query
 
@@ -86,7 +86,7 @@ Tweets are hardly data on their own.  Most meaningful uses of the tweet stream w
  * `temperatureF(val)` returns the temperature in Fahrenheit described in the string `val`.  Performs a regular expression match along the lines of "...(floating-point number)°(C|F)..." which matches strings such as "...35°C..." and "...35°F...".  When a Celcius temperature is matched, converts to Fahrenheit.  Example: `SELECT temperatureF(text) as temperature, tweetLatLng("lat") as latitude, tweetLatLng("lng") as longitude FROM twitter WHERE (text contains 'c' or text contains 'f') AND temperature != NULL;` retrieves a lot of temperatures and latitude/longitude pairs expressed on the stream.
  * `meanDevs(val, [group1, group 2,...])` returns the mean deviation of val from the group depicted by [group1, group2].  Mean deviations can act in place of standard deviations for outlier detection in streaming scenarios.  While it builds up a history of values per group, `meanDevs` returns negative values.  Example: `SELECT temperatureF(text) as temperature, tweetLatLng("lat") as latitude, tweetLatLng("lng") as longitude FROM twitter WHERE (text contains 'c' or text contains 'f') AND temperature != NULL AND meanDevs(temperature, floor(tweetLatLng("lat"), 5), floor(tweetLatLng("lng"), 5)) < 2;`.  To avoid pulling in temperatures from tweets such as "It's 1000000°C in here," we want to pull in tweets whose deviation from the mean within a 5-degree latitude/longitude box is less than 2.  In practice, you will also want this mean deviation check to drop deviations that are negative, since the system is still in a data collection phase for that group.
 
-You can define your own functions as well.  To learn how, read the *User-Defined Functions* section below.
+You can define your own functions as well.  To learn how, read the **User-Defined Functions** section below.
 
 Aggregate Queries
 -----------------
