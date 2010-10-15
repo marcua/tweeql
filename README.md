@@ -16,7 +16,7 @@ There are two options for installing TweeQL:
 
 Initializing your Settings
 ==========================
-TweeQL requires a `settings.py` to be in your current working directory before
+TweeQL requires a `settings.py` file in your current working directory before
 you can use it.  The simplest way to get a working `settings.py` file is to get the template into your current directory:
 
 
@@ -36,7 +36,7 @@ After installing TweeQL, you should be able to run the TweeQL command line by ty
 
 Once at the `tweeql>` command line, you can enter SQL-like queries, which will hit the Twitter Streaming API.
 
-To see Tweets from the Twitter's gardenhose, type `SELECT text FROM twitter_sample;`:
+To see Tweets from the Twitter Spritzer stream, type `SELECT text FROM twitter_sample;`:
 
     tweeql> SELECT text from twitter_sample;
     não sei realmente o que decidir da minha vida.. muito confusa. :S
@@ -47,10 +47,10 @@ These should stream by your screen relatively quickly.  Hit `ctrl+c` to stop the
 
 Queries by Example
 ==================
-Now we'll walk through example queries to teach you the TweeQL syntax.  Check out (http://github.com/marcua/tweeql/blob/master/examples/examples.txt) for a longer list of example queries that you can run in TweeQL.
+Now we'll walk through example queries to teach you the TweeQL syntax.  Check out [examples.txt](http://github.com/marcua/tweeql/blob/master/examples/examples.txt) for a longer list of example queries that you can run in TweeQL.
 
-SELECT FROM WHERE GROUP BY WINDOW
----------------------------------
+TweeQL Syntax
+-------------
 TweeQL borrows its query syntax from SQL, and so queries are of the form 
 
     SELECT field1, field2 FROM streams WHERE filter_conditions GROUP BY field3, field4 WINDOW x seconds
@@ -59,7 +59,7 @@ These keywords work just like in SQL, except for the WINDOW key word, which appl
 
 TWITTER vs. TWITTER_SAMPLE
 --------------------------
-Our first TweeQL query was `SELECT text from twitter_sample;`.  `TWITTER_SAMPLE` is a stream known in the Twitter API as the gardenhose: it is a sample of tweets that constitutes approximately 5% of Twitter's firehose.  You can issue queries to `TWITTER_SAMPLE` without any filter conditions, though you are free to filter this stream.
+Our first TweeQL query was `SELECT text from twitter_sample;`.  `TWITTER_SAMPLE` is a stream known in the Twitter API as the Spritzer stream: it is a sample of tweets that constitutes approximately 5% of Twitter's firehose.  You can issue queries to `TWITTER_SAMPLE` without any filter conditions, though you are free to filter this stream.
 
 If you wish to access more than a sample of the tweets on the stream, you have to query `TWITTER` rather than `TWITTER_SAMPLE`.  To avoid excessive costs, Twitter requires that you issue at least one filter condition along with your query.  For example, you can get all tweet text for tweets that contain the word 'obama' by issuing the following query
 
@@ -80,7 +80,7 @@ Functions
 Tweets are hardly data on their own.  Most meaningful uses of the tweet stream will require some finessing of the data that comes from the stream.  As such, you can run functions that infer information or derive structure from the various fields that TweeQL offers by default.  These functions can appear anywhere a field appears in a query.  The functions that come with TweeQL are
 
  * `strlen(val)` takes `val` (a string) and returns the length of the string.  Example: `SELECT strlen(text) AS length FROM twitter_sample` will print the length of the text of each tweet.
- * `sentiment(val)` takes a string `val` and returns the sentiment of the text (sentiment classification).  A positive value indicated positive sentiment, a negative one indicates negative sentiment, and 0 indicates neutral or no discernible sentiment.  The magnitude of the value is used for aggregation---it does not indicate strength of the sentiment---and represents the inverse of the recall of the classifier for positive and negative tweets. Example: `SELECT sentiment(text) AS sentiment FROM twitter_sample` will return the sentiment of tweets on the gardenhose.
+ * `sentiment(val)` takes a string `val` and returns the sentiment of the text (sentiment classification).  A positive value indicated positive sentiment, a negative one indicates negative sentiment, and 0 indicates neutral or no discernible sentiment.  The magnitude of the value is used for aggregation---it does not indicate strength of the sentiment---and represents the inverse of the recall of the classifier for positive and negative tweets. Example: `SELECT sentiment(text) AS sentiment FROM twitter_sample` will return the sentiment of tweets on the Spritzer stream.
  * `tweetLatLng("lat")/tweetLatLng("lng")` returns the latitude or longitude of the tweet.  If the tweet is geotagged (e.g. by a mobile device), this precise value is used.  If no geotagging information is provided, we use a geocoding service to get latitude and longitude values for the user-specified `location` field. Example: `SELECT tweetLatLng("lat") AS latitude, tweetLatLng("lng") AS longitude, screen_name FROM twitter_sample;` returns the latitude, longitude, and username of twitter users tweeting on the stream.
  * `floor(val, granularity)` returns the floor of a floating-point value to the granularity of `granularity`.  Example: `SELECT floor(tweetLatLng("lat"), .5) AS latitude, floor(tweetLatLng("lng"), .5) AS longitude, screen_name FROM twitter_sample;` rounds the latitude and longitudes in the previous example to the multiple of .5 less than or equal to the actual value.
  * `temperatureF(val)` returns the temperature in Fahrenheit described in the string `val`.  Performs a regular expression match along the lines of "...(floating-point number)°(C|F)..." which matches strings such as "...35°C..." and "...35°F...".  When a Celcius temperature is matched, converts to Fahrenheit.  Example: `SELECT temperatureF(text) as temperature, tweetLatLng("lat") as latitude, tweetLatLng("lng") as longitude FROM twitter WHERE (text contains 'c' or text contains 'f') AND temperature != NULL;` retrieves a lot of temperatures and latitude/longitude pairs expressed on the stream.
@@ -94,7 +94,7 @@ TweeQL provides SQL-like aggregates (`AVG`, `COUNT`, `SUM`, `MIN`, and `MAX`).  
 
     SELECT location, COUNT(text) AS tweets FROM TWITTER_SAMPLE GROUP BY location WINDOW 120 seconds;
 
-would return the location and number of tweets at that location on the gardenhose every 120 seconds.
+would return the location and number of tweets at that location on the Spritzer stream every 120 seconds.
 
 Saving Tweets to a Database
 ===========================
@@ -112,7 +112,7 @@ Programmatic Access
 ===================
 Working from the TweeQL command-line is a good way to get started, but you might want to issue TweeQL queries programmatically.
 
-Here's a simple code sample to get started from, also available at (http://github.com/marcua/tweeql/blob/master/examples/tweeql-programmatic.py):
+Here's a simple code sample to get started from, also available at [tweeql-programmatic.py](http://github.com/marcua/tweeql/blob/master/examples/tweeql-programmatic.py):
 
     from tweeql.exceptions import TweeQLException
     from tweeql.query_runner import QueryRunner
@@ -124,7 +124,7 @@ That's it!  `QueryRunner.run_query` takes a TweeQL query and executes it.  The s
 
 User-Defined Functions (UDFs)
 =============================
-The examples we have shown have used several user-defined functions (`sentiment`, `tweetLatLng`, etc.).  If you wish to write your own UDF, you can do so in python.  The following example, in which we count the length of tweets on the gardenhose, can be found at (http://github.com/marcua/tweeql/blob/master/examples/tweeql-udf.py):
+The examples we have shown have used several user-defined functions (`sentiment`, `tweetLatLng`, etc.).  If you wish to write your own UDF, you can do so in python.  The following example, in which we count the length of tweets on the Spritzer stream, can be found at [tweeql-udf.py](http://github.com/marcua/tweeql/blob/master/examples/tweeql-udf.py):
 
     from tweeql.exceptions import TweeQLException
     from tweeql.field_descriptor import ReturnType
@@ -156,7 +156,7 @@ You can include any number of arguments after `tuple_data`.  In our case, we onl
 
 After we have defined our UDF in `StringLength`, we then register the function.  To do this, we create a `FunctionRegistry`, which is a singleton, and register the function to the TweeQL `stringlength` function.  You can see the `stringlength` function in action on the last line of this example: it's a first-class citizen in our queries now!
 
-To see more UDFs, take a look at (http://github.com/marcua/tweeql/blob/master/tweeql/builtin_functions.py).
+To see more UDFs, take a look at [builtin_functions.py](http://github.com/marcua/tweeql/blob/master/tweeql/builtin_functions.py).
 
 Projects on which TweeQL Depends
 ================================
