@@ -11,8 +11,8 @@ Installation
 ============
 There are two options for installing TweeQL:
 
-  1.  *easy_install/pip*.  Something like `sudo easy_install tweeql` or `sudo pip install tweeql` at the command line should suffice.
-  1.  *from github*.  After checking out this repository, run `python setup.py install` to install!
+  1.  **easy_install/pip**.  Something like `sudo easy_install tweeql` or `sudo pip install tweeql` at the command line should suffice.
+  1.  **from github**.  After checking out this repository, run `python setup.py install` to install!
 
 Initializing your Settings
 ==========================
@@ -75,6 +75,19 @@ Fields can appear in SELECT, WHERE, or GROUP BY clauses, and can be separated by
 
     SELECT screen_name, created_at, text FROM twitter WHERE text contains 'obama' AND location != NULL;
 
+Saving Tweets to a Database
+---------------------------
+Printing tweets to your screen might be fun, but it's not always the desired result.  TweeQL provides an `INTO` keyword to faciliate dumping tweets to other locations.  By default (when not specified), TweeQL sends tweets `INTO STDOUT` (the screen).  Alternatively, you can send tweets `INTO TABLE tablename`, which will insert the tweets into a table `tablename`.  For example:
+
+`SELECT screen_name, text FROM twitter INTO TABLE obama_tweets WHERE text contains 'obama';`
+
+If `obama_tweets` does not exist, it will be created with the schema specified by the `SELECT` parameters.  If the table already exists and matches the schema of the `SELECT` parameters, tweets will be appended to that location.  
+
+The database which contains the table is specified in `settings.py` either through the `DATABASE_URI` or `DATABASE_CONFIG` parameters.  By default, a sqlite3 database called `test.db` will be created in your current working directory.  
+
+For performance reasons, TweeQL batches records in groups of 1000 before inserting them into the database.  This means that if you end the query before 1000 records are generated, you will lose those records.  E-mail me if you rely on a more durable solution.
+
+
 Functions
 ---------
 Tweets are hardly data on their own.  Most meaningful uses of the tweet stream will require some finessing of the data that comes from the stream.  As such, you can run functions that infer information or derive structure from the various fields that TweeQL offers by default.  These functions can appear anywhere a field appears in a query.  The functions that come with TweeQL are
@@ -95,18 +108,6 @@ TweeQL provides SQL-like aggregates (`AVG`, `COUNT`, `SUM`, `MIN`, and `MAX`).  
     SELECT location, COUNT(text) AS tweets FROM TWITTER_SAMPLE GROUP BY location WINDOW 120 seconds;
 
 would return the location and number of tweets at that location on the Spritzer stream every 120 seconds.
-
-Saving Tweets to a Database
-===========================
-Printing tweets to your screen might be fun, but it's not always the desired result.  TweeQL provides an `INTO` keyword to faciliate dumping tweets to other locations.  By default (when not specified), TweeQL sends tweets `INTO STDOUT` (the screen).  Alternatively, you can send tweets `INTO TABLE tablename`, which will insert the tweets into a table `tablename`.  For example:
-
-`SELECT screen_name, text FROM twitter INTO TABLE obama_tweets WHERE text contains 'obama';`
-
-If `obama_tweets` does not exist, it will be created with the schema specified by the `SELECT` parameters.  If the table already exists and matches the schema of the `SELECT` parameters, tweets will be appended to that location.  
-
-The database which contains the table is specified in `settings.py` either through the `DATABASE_URI` or `DATABASE_CONFIG` parameters.  By default, a sqlite3 database called `test.db` will be created in your current working directory.  
-
-For performance reasons, TweeQL batches records in groups of 1000 before inserting them into the database.  This means that if you end the query before 1000 records are generated, you will lose those records.  E-mail me if you rely on a more durable solution.
 
 Programmatic Access
 ===================
