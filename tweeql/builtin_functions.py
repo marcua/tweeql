@@ -5,6 +5,7 @@ from tweeql.function_registry import FunctionInformation
 from tweeql.function_registry import FunctionRegistry
 from geopy import geocoders
 from ordereddict import OrderedDict
+from pkg_resources import resource_filename
 from threading import RLock
 from urllib2 import URLError
 
@@ -60,7 +61,7 @@ class Sentiment:
             import tweeql.extras.sentiment
             import tweeql.extras.sentiment.analysis
             Sentiment.analysis = tweeql.extras.sentiment.analysis
-            fname = os.path.join(os.path.dirname(tweeql.extras.sentiment.__file__), 'sentiment.pkl.gz')
+            fname = resource_filename(tweeql.extras.sentiment.__name__, 'sentiment.pkl.gz')
             fp = gzip.open(fname)
             classifier_dict = pickle.load(fp)
             fp.close()
