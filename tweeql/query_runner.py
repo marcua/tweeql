@@ -4,14 +4,16 @@ from tweeql.exceptions import QueryException
 from tweeql.exceptions import DbException
 from tweeql.operators import StatusSource
 from tweeql.query_builder import gen_query_builder
+from tweeql.settings_loader import get_settings
 from tweeql.tuple_descriptor import Tuple
 from threading import RLock
 from threading import Thread
 from tweepy import StreamListener
 from tweepy import Stream
 
-import settings
 import time
+
+settings = get_settings()
 
 class QueryRunner(StreamListener):
     def __init__(self):
