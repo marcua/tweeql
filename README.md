@@ -9,7 +9,7 @@ of implementing the API correctly.
 
 Community
 =========
-Mailing List: [Google Group](http://groups.google.com/group/tweeql)---http://groups.google.com/group/tweeql
+Mailing List: [Google Group](http://groups.google.com/group/tweeql)---http://groups.google.com/group/tweeql   
 IRC: freenode.net #tweeql ([web interface](http://webchat.freenode.net/?channels=tweeql))
 
 Installation
