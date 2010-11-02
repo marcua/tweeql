@@ -7,6 +7,8 @@ expressed user sentiment from the text of every tweet that passes through
 the Twitter Streaming API.  All this, without having to worry about the details
 of implementing the API correctly.
 
+For help, suggestions, or discussion, join the [Google Group](http://groups.google.com/group/tweeql): http://groups.google.com/group/tweeql
+
 Installation
 ============
 There are two options for installing TweeQL:
