@@ -7,7 +7,9 @@ expressed user sentiment from the text of every tweet that passes through
 the Twitter Streaming API.  All this, without having to worry about the details
 of implementing the API correctly.
 
-For help, suggestions, or discussion, join the [Google Group](http://groups.google.com/group/tweeql): http://groups.google.com/group/tweeql
+** For help, suggestions, or discussion, join the [Google
+Group](http://groups.google.com/group/tweeql):
+http://groups.google.com/group/tweeql **
 
 Installation
 ============
@@ -163,7 +165,7 @@ To see more UDFs, take a look at [builtin_functions.py](http://github.com/marcua
 Projects on which TweeQL Depends
 ================================
 tweepy---Twitter API in Python.  TweeQL would not exist without Tweepy!  
-pyparsing---For the SSQL parsing  
+pyparsing---For the TweeQL parsing  
 sqlalchemy---For putting results into a relational database  
 ordereddict---For creating an LRU cache of keys (geoloc cache)  
 geopy---For geolocation  
