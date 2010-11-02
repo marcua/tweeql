@@ -7,9 +7,10 @@ expressed user sentiment from the text of every tweet that passes through
 the Twitter Streaming API.  All this, without having to worry about the details
 of implementing the API correctly.
 
-** For help, suggestions, or discussion, join the [Google
-Group](http://groups.google.com/group/tweeql):
-http://groups.google.com/group/tweeql **
+Community
+=========
+Mailing List: [Google Group](http://groups.google.com/group/tweeql)---http://groups.google.com/group/tweeql
+IRC: freenode.net #tweeql ([web interface](http://webchat.freenode.net/?channels=tweeql))
 
 Installation
 ============
