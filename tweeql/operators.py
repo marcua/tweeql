@@ -3,10 +3,6 @@ from field_descriptor import FieldDescriptor
 from query import QueryTokens
 from twitter_fields import TwitterFields
 
-class StatusSource(object):
-    TWITTER_FILTER = 1
-    TWITTER_SAMPLE = 2
-
 class QueryOperator(object):
     """
         QueryOperator represents an operator in the stream query plan.

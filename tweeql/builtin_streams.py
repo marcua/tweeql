@@ -2,6 +2,7 @@ from datetime import datetime
 from field_descriptor import FieldDescriptor
 from field_descriptor import FieldType
 from field_descriptor import ReturnType
+from stream_registry import StreamInformation, StreamRegistry, StreamTypes
 from tuple_descriptor import TupleDescriptor
 
 def twitter_user_data_extractor(field):
@@ -10,7 +11,6 @@ def twitter_user_data_extractor(field):
             return getattr(data[TwitterFields.USER], field)
         return extract
     return factory
-
 class TwitterFields:
     TEXT = "text"
     USER = "user"
@@ -22,11 +22,10 @@ class TwitterFields:
     CREATED_AT = "created_at"
     PROFILE_IMAGE_URL = "profile_image_url"
     
-# built here so we can refer to this field in the GroupBy operator. 
+# built here so we can refer to this field in the GroupBy operator.
 TwitterFields.created_field = FieldDescriptor(TwitterFields.CREATED_AT, [TwitterFields.CREATED_AT], FieldType.FIELD, ReturnType.DATETIME)
-
-def twitter_tuple_descriptor():
-    fields = [
+    
+twitter_tuple_descriptor = TupleDescriptor([
         FieldDescriptor(TwitterFields.TEXT, [TwitterFields.TEXT], FieldType.FIELD, ReturnType.STRING),
         FieldDescriptor(TwitterFields.LOCATION, [], FieldType.FUNCTION, ReturnType.STRING, None, twitter_user_data_extractor(TwitterFields.LOCATION)),
         FieldDescriptor(TwitterFields.LANG, [], FieldType.FUNCTION, ReturnType.STRING, None, twitter_user_data_extractor(TwitterFields.LANG)),
@@ -34,6 +33,9 @@ def twitter_tuple_descriptor():
         FieldDescriptor(TwitterFields.SSQL_USER_ID, [], FieldType.FUNCTION, ReturnType.INTEGER, None, twitter_user_data_extractor(TwitterFields.TWITTER_USER_ID)),
         FieldDescriptor(TwitterFields.SCREEN_NAME, [], FieldType.FUNCTION, ReturnType.STRING, None, twitter_user_data_extractor(TwitterFields.SCREEN_NAME)),
         TwitterFields.created_field,
-    ]
-    return TupleDescriptor(fields)
+    ])
 
+def register_default_streams():
+    sr = StreamRegistry()
+    sr.register("TWITTER", StreamInformation(StreamTypes.STREAMING, twitter_tuple_descriptor, None))
+    sr.register("TWITTER_SAMPLE", StreamInformation(StreamTypes.STREAMING, twitter_tuple_descriptor, None))

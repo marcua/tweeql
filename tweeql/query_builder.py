@@ -2,7 +2,6 @@ from itertools import chain
 from pyparsing import ParseException
 from tweeql import operators
 from tweeql.aggregation import get_aggregate_factory
-from tweeql.operators import StatusSource
 from tweeql.exceptions import QueryException
 from tweeql.exceptions import DbException
 from tweeql.field_descriptor import FieldDescriptor
@@ -14,8 +13,8 @@ from tweeql.query import QueryTokens
 from tweeql.tweeql_parser import gen_parser
 from tweeql.status_handlers import PrintStatusHandler
 from tweeql.status_handlers import DbInsertStatusHandler
+from tweeql.stream_registry import StreamRegistry
 from tweeql.tuple_descriptor import TupleDescriptor
-from tweeql.twitter_fields import twitter_tuple_descriptor
 
 def gen_query_builder():
     return QueryBuilder()
@@ -29,7 +28,7 @@ class QueryBuilder:
         self.parser = gen_parser()
         self.function_registry = FunctionRegistry()
         self.unnamed_operator_counter = 0
-        self.twitter_td = twitter_tuple_descriptor()
+        self.stream_registry = StreamRegistry()
     def build(self, query_str):
         """
             Takes a Unicode string query_str, and outputs a query tree
@@ -40,26 +39,21 @@ class QueryBuilder:
             raise QueryException(e)
 
         source = self.__get_source(parsed)
-        tree = self.__get_tree(parsed)
+        tree = self.__get_tree(parsed, source)
         handler = self.__get_handler(parsed)
         query = Query(tree, source, handler)
         return query
     def __get_source(self, parsed):
-        source = parsed.sources[0]
-        if source == QueryTokens.TWITTER:
-            return StatusSource.TWITTER_FILTER
-        elif source.startswith(QueryTokens.TWITTER_SAMPLE):
-            return StatusSource.TWITTER_SAMPLE
-        else:
-            raise QueryException('Unknown query source: %s' % (source))
-    def __get_tree(self, parsed):
+        source = self.stream_registry.get_stream(parsed.sources[0])
+        return source
+    def __get_tree(self, parsed, source):
         select = parsed.select.asList()[1:][0]
         where_clause = parsed.where.asList()
         groupby = parsed.groupby.asList()
         window = parsed.window.asList()
         window = None if window == [''] else window[1:]
-        (tree, where_fields) = self.__parse_where(where_clause)
-        tree = self.__add_select_and_aggregate(select, groupby, where_fields, window, tree)
+        (tree, where_fields) = self.__parse_where(where_clause, source)
+        tree = self.__add_select_and_aggregate(select, groupby, where_fields, window, tree, source)
         return tree
     def __get_handler(self, parsed):
         into = parsed.into.asList()
@@ -73,15 +67,15 @@ class QueryBuilder:
         else:
             raise QueryException("Invalid INTO clause")
         return handler
-    def __parse_where(self, where_clause):
+    def __parse_where(self, where_clause, source):
         tree = None
         where_fields = []
         if where_clause == ['']: # no where predicates
             tree = operators.AllowAll() 
         else:
-            tree = self.__parse_clauses(where_clause[0][1:], where_fields)
+            tree = self.__parse_clauses(where_clause[0][1:], where_fields, source)
         return (tree, where_fields)
-    def __parse_clauses(self, clauses, where_fields):
+    def __parse_clauses(self, clauses, where_fields, source):
         """
             Parses the WHERE clauses in the query.  Adds any fields it discovers to where_fields
         """
@@ -89,7 +83,7 @@ class QueryBuilder:
         if type(clauses) != list: # This is a token, not an expression 
             return clauses
         elif clauses[0] == QueryTokens.WHERE_CONDITION: # This is an operator expression
-            return self.__parse_operator(clauses[1:], where_fields)
+            return self.__parse_operator(clauses[1:], where_fields, source)
         else: # This is a combination of expressions w/ AND/OR
             # ands take precedent over ors, so 
             # A and B or C and D -> (A and B) or (C and D)
@@ -97,7 +91,7 @@ class QueryBuilder:
             ors = []
             i = 0
             while i < len(clauses):
-                ands.append(self.__parse_clauses(clauses[i], where_fields))
+                ands.append(self.__parse_clauses(clauses[i], where_fields, source))
                 if i+1 == len(clauses):
                     ors.append(self.__and_or_single(ands))
                 else:
@@ -113,15 +107,15 @@ class QueryBuilder:
                 return ors[0]
             else:
                 return operators.Or(ors)
-    def __parse_operator(self, clause, where_fields):
+    def __parse_operator(self, clause, where_fields, source):
         if len(clause) == 3 and clause[1] == QueryTokens.CONTAINS:
-            alias = self.__where_field(clause[0], where_fields)
+            alias = self.__where_field(clause[0], where_fields, source)
             return operators.Contains(alias, self.__parse_rval(clause[2], allow_null=False))
         elif len(clause) == 3 and ((clause[1] == QueryTokens.EQUALS) or (clause[1] == QueryTokens.DOUBLE_EQUALS)):
-            alias = self.__where_field(clause[0], where_fields)
+            alias = self.__where_field(clause[0], where_fields, source)
             return operators.Equals(alias, self.__parse_rval(clause[2], allow_null=True))
         elif len(clause) == 3 and clause[1] == QueryTokens.EXCLAIM_EQUALS:
-            alias = self.__where_field(clause[0], where_fields)
+            alias = self.__where_field(clause[0], where_fields, source)
             return operators.Not(operators.Equals(alias, self.__parse_rval(clause[2], allow_null=True)))
     def __parse_rval(self, val, allow_null):
         if val == QueryTokens.NULL_TOKEN:
@@ -131,8 +125,8 @@ class QueryBuilder:
                 raise QueryException("NULL appears in clause where it should not.")
         else:
             return val
-    def __where_field(self, field, where_fields):
-        (field_descriptors, verify) = self.__parse_field(field, self.twitter_td, False, False)
+    def __where_field(self, field, where_fields, source):
+        (field_descriptors, verify) = self.__parse_field(field, source.tuple_descriptor, False, False)
         alias = field_descriptors[0].alias
         # name the field whatever alias __parse_field gave it so it can be
         # passed to __parse_field in the future and have a consistent name
@@ -153,7 +147,7 @@ class QueryBuilder:
             return ands[0]
         else:
             return operators.And(ands)
-    def __add_select_and_aggregate(self, select, groupby, where, window, tree):
+    def __add_select_and_aggregate(self, select, groupby, where, window, tree, source):
         """
             select, groupby, and where are a list of unparsed fields
             in those respective clauses
@@ -166,7 +160,7 @@ class QueryBuilder:
             all_fields = chain(all_fields, groupby)
         self.__remove_all(groupby, QueryTokens.EMPTY_STRING)     
         for field in all_fields:
-            (field_descriptors, verify) = self.__parse_field(field, self.twitter_td, True, False)
+            (field_descriptors, verify) = self.__parse_field(field, source.tuple_descriptor, True, False)
             fields_to_verify.extend(verify)
             tuple_descriptor.add_descriptor_list(field_descriptors)
         for field in fields_to_verify:

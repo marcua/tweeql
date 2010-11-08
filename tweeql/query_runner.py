@@ -1,8 +1,8 @@
 from getpass import getpass
 from tweeql.builtin_functions import register_default_functions
+from tweeql.builtin_streams import register_default_streams
 from tweeql.exceptions import QueryException
 from tweeql.exceptions import DbException
-from tweeql.operators import StatusSource
 from tweeql.query_builder import gen_query_builder
 from tweeql.settings_loader import get_settings
 from tweeql.tuple_descriptor import Tuple
@@ -18,6 +18,7 @@ settings = get_settings()
 class QueryRunner(StreamListener):
     def __init__(self):
         register_default_functions()
+        register_default_streams()
         StreamListener.__init__(self)
         try:
             self.username = settings.TWITTER_USERNAME
@@ -45,6 +46,7 @@ class QueryRunner(StreamListener):
         self.build_stream()
         self.query = query_built
         self.query.handler.set_tuple_descriptor(self.query.get_tuple_descriptor())
+        """
         if self.query.source == StatusSource.TWITTER_FILTER:
             no_filter_exception = QueryException("You haven't specified any filters that can query Twitter.  Perhaps you want to query TWITTER_SAMPLE?")
             try:
@@ -56,6 +58,7 @@ class QueryRunner(StreamListener):
                 raise no_filter_exception
         elif self.query.source == StatusSource.TWITTER_SAMPLE:
             self.stream.sample(None, async)
+        """
     def run_query(self, query_str, async):
         if isinstance(query_str, str):
             query_str = unicode(query_str, 'utf-8')
