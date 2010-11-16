@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from tweeql.exceptions import TweeQLException
 from tweeql.query_runner import QueryRunner
 
