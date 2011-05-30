@@ -1,8 +1,42 @@
 SELECT text, location FROM twitter_sample;
 
-SELECT text, temperatureF(text) as temperature, location FROM twitter WHERE (text contains 'c' or text contains 'f') AND temperature != NULL;
+
+
+
+
+
+
+
+
+
+
+SELECT text FROM twitter WHERE text contains 'obama'
+
+
+
+
+
+
+
+
+
+
+SELECT sentiment(text) AS sentiment, text FROM twitter where text contains 'obama';
+
+
+
+
+
+
+
+
+SELECT text, temperatureF(text) AS temperature, location FROM twitter WHERE (text contains 'c' or text contains 'f') AND temperature != NULL;
+
+
+
 
 SELECT temperatureF(text) as temperature, location, tweetLatLng("lat") as latitude, tweetLatLng("lng") as longitude FROM twitter WHERE (text contains 'c' or text contains 'f') AND temperature != NULL;
+
 
 -- aggregates with sliding windows
 -- joins: join streaming API with the standard API---get followers of people who talk about justin beiber
