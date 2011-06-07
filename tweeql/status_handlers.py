@@ -24,7 +24,7 @@ class PrintStatusHandler(StatusHandler):
         td = self.tuple_descriptor
         for status in statuses:
             vals = (unicode(val) for (alias, val) in status.as_iterable_visible_pairs())
-            print self.delimiter.join(vals)
+            print self.delimiter.join(vals) + "\n"
 
 class DbInsertStatusHandler(StatusHandler):
     engine = None
