@@ -200,7 +200,7 @@ class QueryBuilder:
                 if group_field == None and \
                    select_field.field_type != FieldType.AGGREGATE and \
                    select_field.visible:
-                    raise QueryException("'%s' appears in the SELECT but is is neither an aggregate nor a GROUP BY field" % (alias))
+                    pass#raise QueryException("'%s' appears in the SELECT but is is neither an aggregate nor a GROUP BY field" % (alias))
             tree = operators.GroupBy(tree, group_descriptor, aggregates, window)
         tree.assign_descriptor(select_descriptor)
         return tree
