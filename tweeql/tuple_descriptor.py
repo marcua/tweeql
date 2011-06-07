@@ -4,6 +4,15 @@ from field_descriptor import FieldType
 from field_descriptor import ReturnType
 from tweeql.exceptions import QueryException
 
+# fix deepcopy on instance methods
+# see http://bugs.python.org/issue1515
+import copy
+import types
+
+def _deepcopy_method(x, memo):
+    return type(x)(x.im_func, copy.deepcopy(x.im_self, memo), x.im_class)
+copy._deepcopy_dispatch[types.MethodType] = _deepcopy_method
+
 class Tuple():
     def __init__(self):
         self.__tuple_descriptor = None
