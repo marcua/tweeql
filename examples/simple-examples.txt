@@ -42,8 +42,7 @@ SELECT temperatureF(text) as temperature, location, tweetLatLng("lat") as latitu
 
 
 
-SELECT COUNT(text) as c, meanDevs(c) as md FROM twitter WHERE text contains
-'obama' WINDOW 5 seconds;
+SELECT COUNT(text) as c, meanDevs(c) as md FROM twitter WHERE text contains 'obama' WINDOW 5 seconds;
 
 
 
