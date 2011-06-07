@@ -286,4 +286,6 @@ class GroupBy(QueryOperator):
         for aggregate in self.aggregates:
             with_aggregates.add_descriptor(aggregate)
         with_aggregates.add_descriptor(TwitterFields.created_field)
+        for alias, fd in tuple_descriptor.descriptors.items():
+            with_aggregates.add_descriptor(fd)
         self.child.assign_descriptor(with_aggregates)
