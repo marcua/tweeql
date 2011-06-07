@@ -38,6 +38,19 @@ SELECT text, temperatureF(text) AS temperature, location FROM twitter WHERE (tex
 SELECT temperatureF(text) as temperature, location, tweetLatLng("lat") as latitude, tweetLatLng("lng") as longitude FROM twitter WHERE (text contains 'c' or text contains 'f') AND temperature != NULL;
 
 
+
+
+
+
+SELECT COUNT(text) as c, meanDevs(c) as md FROM twitter WHERE text contains
+'obama' WINDOW 5 seconds;
+
+
+
+
+
+
+
 -- aggregates with sliding windows
 -- joins: join streaming API with the standard API---get followers of people who talk about justin beiber
 -- outlier detection: don't trust all temperatures
