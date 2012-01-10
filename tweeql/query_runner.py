@@ -8,8 +8,9 @@ from tweeql.settings_loader import get_settings
 from tweeql.tuple_descriptor import Tuple
 from threading import RLock
 from threading import Thread
-from tweepy import StreamListener
 from tweepy import Stream
+from tweepy import StreamListener
+from tweepy.auth import BasicAuthHandler
 
 import time
 
@@ -34,8 +35,7 @@ class QueryRunner(StreamListener):
         if self.stream != None:
             self.stop_query()
             time.sleep(.01) # make sure old stream has time to disconnect
-        self.stream = Stream(self.username,
-                             self.password,
+        self.stream = Stream(BasicAuthHandler(self.username, self.password),
                              self, # this object implements StreamListener
                              timeout = 600, # reconnect if no messages in 600s
                              retry_count = 20, # try reconnecting 20 times
