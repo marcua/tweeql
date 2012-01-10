@@ -25,7 +25,7 @@ TweeQL requires a `settings.py` file in your current working directory before
 you can use it.  The simplest way to get a working `settings.py` file is to get the template into your current directory:
 
 
-`curl https://github.com/marcua/tweeql/raw/master/settings.py.template > settings.py`
+`curl https://raw.github.com/marcua/tweeql/master/settings.py.template > settings.py`
 
 This file should work without editing.  You can edit it to provide a username/password for the streaming API, or to change the database into which extracted data will be inserted.
 
