@@ -5,6 +5,7 @@ from tweeql.query_runner import QueryRunner
 
 import settings
 import traceback
+import readline
 
 def main():
     runner = QueryRunner()
