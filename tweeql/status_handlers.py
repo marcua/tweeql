@@ -39,10 +39,12 @@ class DbInsertStatusHandler(StatusHandler):
                     dbconfig = settings.DATABASE_CONFIG
                 except AttributeError:
                     pass
-                if dbconfig == None:
-                    DbInsertStatusHandler.engine = create_engine(dburi, echo=False, pool_size=1)
-                else:
-                    DbInsertStatusHandler.engine = create_engine(dburi, connect_args=dbconfig, echo=False, pool_size=1)
+                kwargs = {'echo': False}
+                if not dburi.startswith("sqlite"):
+                    kwargs['pool_size'] = 1                    
+                if dbconfig != None:
+                    kwargs['connect_args'] = dbconfig
+                DbInsertStatusHandler.engine = create_engine(dburi, **kwargs)
             except AttributeError, e:
                 raise e
                 raise SettingsException("To put results INTO a TABLE, please specify a DATABASE_URI in settings.py") 
