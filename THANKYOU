@@ -1,0 +1,3 @@
+Gael Pasgrimaud: fixed issue with setuptools
+Joe Hellerstein: recommended use of readline, helped with setuptools debugging
+Sanjay Kairam: found bug in connection pooling with sqlite
