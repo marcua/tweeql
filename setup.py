@@ -17,6 +17,6 @@ setup(name="tweeql",
       packages = find_packages(),
       scripts = ['tweeql/bin/tweeql-command-line.py'],
       package_data = { '' : ['*sentiment.pkl.gz'] },
-      install_requires = ['tweepy', 'pyparsing==1.5.6', 'sqlalchemy>=0.6.1', 'ordereddict', 'geopy'],
+      install_requires = ['tweepy', 'pyparsing<=1.5.7', 'sqlalchemy>=0.6.1', 'ordereddict', 'geopy'],
       keywords= "twitter query sql library",
       zip_safe = True)
