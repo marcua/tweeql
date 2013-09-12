@@ -1,6 +1,12 @@
-# Twitter authentication information
-#TWITTER_USERNAME = ""
-#TWITTER_PASSWORD = ""
+# Sign in and create an app on https://dev.twitter.com.
+# You will get the consumer_key and consumer_secret. 
+#consumer_key=""
+#consumer_secret=""
+
+# After create and get the above key, you will be redirected to app page.
+# Create an access token under the the "Your access token" section, then you'll get the following two key
+#access_token=""
+#access_token_secret=""
 
 # set to a database URI according to sqlalchemy's scheme for the database to dump stored tweets into
 DATABASE_URI = "sqlite:///test.db"
