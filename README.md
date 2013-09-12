@@ -25,7 +25,7 @@ TweeQL requires a `settings.py` file in your current working directory before
 you can use it.  The simplest way to get a working `settings.py` file is to get the template into your current directory:
 
 
-`curl https://raw.github.com/fbukevin/tweeql/master/settings.py.template > settings.py`
+`curl https://raw.github.com/marcua/tweeql/master/settings.py.template > settings.py`
 
 This file should work without editing.  You can edit it to provide a username/password for the streaming API, or to change the database into which extracted data will be inserted.
 
@@ -33,12 +33,10 @@ A first example
 ===============
 After installing TweeQL, you should be able to run the TweeQL command line by typing `tweeql-command-line.py`:
 
-    veck@PLSM-Veck ~ $  tweeql-command-line.py
-    Check if consumer_key, consumer_secret, access_token, and access_token_secret are defined in settings.py
-    Consumer key:U9VQ74TGNcs2A0GCzWefg
-    Consumer secret: 
-    Access token:1274191327-IPRjFc8mijSO2bfXHFuJm4lyD03lpRCQLTLXnlz
-    Access token secret: 
+    marcua@marcua-x60:~$ tweeql-command-line.py
+    TWITTER_USERNAME and TWITTER_PASSWORD not defined in settings.py
+    Twitter username: marcuatest3
+    Twitter password: 
     tweeql>
 
 Once at the `tweeql>` command line, you can enter SQL-like queries, which will hit the Twitter Streaming API.
