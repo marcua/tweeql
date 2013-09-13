@@ -21,12 +21,12 @@ class QueryRunner(StreamListener):
         register_default_functions()
         StreamListener.__init__(self)
         try:
-			self.consumer_key = settings.consumer_key
-			self.consumer_secret = settings.consumer_secret
-			self.access_token = settings.access_token
-			self.access_token_secret = settings.access_token_secret
+			self.consumer_key = settings.CONSUMER_KEY
+			self.consumer_secret = settings.CONSUMER_SECRET
+			self.access_token = settings.ACCESS_TOKEN
+			self.access_token_secret = settings.ACCESS_TOKEN_SECRET
         except AttributeError:
-            print "Check if consumer_key, consumer_secret, access_token, and access_token_secret are defined in settings.py"
+            print "Check if CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, and ACCESS_TOKEN_SECRET are defined in settings.py"
             self.consumer_key = raw_input('Consumer key: ')
             self.consumer_secret = getpass('Consumer secret: ')
             self.access_token = raw_input('Access token: ')
