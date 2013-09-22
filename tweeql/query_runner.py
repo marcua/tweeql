@@ -41,7 +41,7 @@ class QueryRunner(StreamListener):
             time.sleep(.01) # make sure old stream has time to disconnect
         oauth = OAuthHandler(self.consumer_key, self.consumer_secret)
         oauth.set_access_token(self.access_token, self.access_token_secret)
-        self.stream = Stream(oauth,#do OAuthentication for stream
+        self.stream = Stream(oauth, # do OAuthentication for stream
                              self, # this object implements StreamListener
                              timeout = 600, # reconnect if no messages in 600s
                              retry_count = 20, # try reconnecting 20 times
