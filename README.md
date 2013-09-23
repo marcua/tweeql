@@ -34,9 +34,11 @@ A first example
 After installing TweeQL, you should be able to run the TweeQL command line by typing `tweeql-command-line.py`:
 
     marcua@marcua-x60:~$ tweeql-command-line.py
-    TWITTER_USERNAME and TWITTER_PASSWORD not defined in settings.py
-    Twitter username: marcuatest3
-    Twitter password:
+    Check if CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, and ACCESS_TOKEN_SECRET are defined in settings.py
+    Consumer key: XXX
+    Consumer secret: 
+    Access token: XXX
+    Access token secret:
     tweeql>
 
 Once at the `tweeql>` command line, you can enter SQL-like queries, which will hit the Twitter Streaming API.

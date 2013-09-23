@@ -4,3 +4,5 @@ Joe Hellerstein: recommended use of readline, helped with setuptools
 debugging, discovered that setuptools wasn't packaging sentiment analysis
 
 Sanjay Kairam: found bug in connection pooling with sqlite
+
+Veck Hsiao: modify the authorization method from BasicAuth to OAuth.

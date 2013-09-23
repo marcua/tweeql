@@ -10,7 +10,7 @@ from threading import RLock
 from threading import Thread
 from tweepy import Stream
 from tweepy import StreamListener
-from tweepy.auth import BasicAuthHandler
+from tweepy.auth import OAuthHandler
 
 import time
 
@@ -21,12 +21,16 @@ class QueryRunner(StreamListener):
         register_default_functions()
         StreamListener.__init__(self)
         try:
-            self.username = settings.TWITTER_USERNAME
-            self.password = settings.TWITTER_PASSWORD
+			self.consumer_key = settings.CONSUMER_KEY
+			self.consumer_secret = settings.CONSUMER_SECRET
+			self.access_token = settings.ACCESS_TOKEN
+			self.access_token_secret = settings.ACCESS_TOKEN_SECRET
         except AttributeError:
-            print "TWITTER_USERNAME and TWITTER_PASSWORD not defined in settings.py"
-            self.username = raw_input('Twitter username: ')
-            self.password = getpass('Twitter password: ')
+            print "Check if CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, and ACCESS_TOKEN_SECRET are defined in settings.py"
+            self.consumer_key = raw_input('Consumer key: ')
+            self.consumer_secret = getpass('Consumer secret: ')
+            self.access_token = raw_input('Access token: ')
+            self.access_token_secret = getpass('Access token secret: ')
         self.status_lock = RLock()
         self.statuses = []
         self.query_builder = gen_query_builder()
@@ -35,7 +39,9 @@ class QueryRunner(StreamListener):
         if self.stream != None:
             self.stop_query()
             time.sleep(.01) # make sure old stream has time to disconnect
-        self.stream = Stream(BasicAuthHandler(self.username, self.password),
+        oauth = OAuthHandler(self.consumer_key, self.consumer_secret)
+        oauth.set_access_token(self.access_token, self.access_token_secret)
+        self.stream = Stream(oauth, # do OAuthentication for stream
                              self, # this object implements StreamListener
                              timeout = 600, # reconnect if no messages in 600s
                              retry_count = 20, # try reconnecting 20 times
