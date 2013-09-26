@@ -13,7 +13,7 @@ def main():
         while True:
             cmd = raw_input("tweeql> ");
             process_command(runner, cmd)
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, EOFError):
         print '\nGoodbye!'
 
 def process_command(runner, cmd):
