@@ -125,7 +125,10 @@ class Location:
             while len(self) > size:
                 self.popitem(last=False)
 
-    gn = geocoders.GeoNames()
+    from tweeql.settings_loader import get_settings
+    settings = get_settings()
+    gn = geocoders.GeoNames(country_bias=None, username=settings.GEONAMES_USERNAME, timeout=None, proxies=None)
+	
     return_type = ReturnType.FLOAT
     LATLNG = "__LATLNG"
     LAT = "lat"

@@ -8,6 +8,10 @@
 #ACCESS_TOKEN=""
 #ACCESS_TOKEN_SECRET=""
 
+#Create an account at GeoNames and enable the account for use of free web services
+#http://www.geonames.org/login
+#GEONAMES_USERNAME="yourUserName"
+
 # set to a database URI according to sqlalchemy's scheme for the database to dump stored tweets into
 DATABASE_URI = "sqlite:///test.db"
 # to send parameters to the connection argument, set the DATABASE_URI to
