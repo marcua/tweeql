@@ -181,8 +181,6 @@ class Location:
                 for place, (lat, lng) in g:
                     latlng = (lat, lng)
                     break
-            else:
-			    print "No coordinates reported"
         except URLError:
             e = sys.exc_info()[1]
             print "Unable to connect to GeoNames: %s" % (e)
