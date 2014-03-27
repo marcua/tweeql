@@ -6,8 +6,10 @@ from tweeql.query_runner import QueryRunner
 import settings
 import traceback
 import readline
-#Installing on Windows, uncomment the line below
-#import pyreadline as readline
+try:
+    import pyreadline as readline
+except:
+    pass
 
 def main():
     runner = QueryRunner()
