@@ -125,7 +125,10 @@ class Location:
             while len(self) > size:
                 self.popitem(last=False)
 
-    gn = geocoders.GeoNames()
+    from tweeql.settings_loader import get_settings
+    settings = get_settings()
+    gn = geocoders.GeoNames(country_bias=None, username=settings.GEONAMES_USERNAME, timeout=None, proxies=None)
+	
     return_type = ReturnType.FLOAT
     LATLNG = "__LATLNG"
     LAT = "lat"
@@ -174,9 +177,10 @@ class Location:
         latlng = None
         try:
             g = Location.gn.geocode(loc.encode('utf-8'), exactly_one=False)
-            for place, (lat, lng) in g:
-                latlng = (lat, lng)
-                break
+            if g is not None:
+                for place, (lat, lng) in g:
+                    latlng = (lat, lng)
+                    break
         except URLError:
             e = sys.exc_info()[1]
             print "Unable to connect to GeoNames: %s" % (e)

@@ -19,6 +19,10 @@ There are two options for installing TweeQL:
   1.  **easy_install/pip**.  Something like `sudo easy_install tweeql` or `sudo pip install tweeql` at the command line should suffice.
   1.  **from github**.  After checking out this repository, run `sudo python setup.py install` to install!  Note: if you do this in Ubuntu/Debian, type `sudo apt-get install python-setuptools` first.
 
+Installing Python in Windows:
+  1. Download and Install pyreadline using a suitable installer from here: https://pypi.python.org/pypi/pyreadline/2.0
+  2. run `python setup.py install` on the windows command line. 
+
 Initializing your Settings
 ==========================
 TweeQL requires a `settings.py` file in your current working directory before
@@ -27,7 +31,7 @@ you can use it.  The simplest way to get a working `settings.py` file is to get 
 
 `curl https://raw.github.com/marcua/tweeql/master/settings.py.template > settings.py`
 
-This file should work without editing.  You can edit it to provide a username/password for the streaming API, or to change the database into which extracted data will be inserted.
+This file should work without editing.  You can edit it to provide a username/password for the streaming API, or to change the database into which extracted data will be inserted. Edit settings.py to include the username of the account you created at GeoNames.
 
 A first example
 ===============
@@ -157,7 +161,8 @@ The examples we have shown have used several user-defined functions (`sentiment`
     runner = QueryRunner()
     runner.run_query("SELECT stringlength(text) AS len FROM twitter_sample;", False)
 
-In this example, we build the class `StringLength`, which has two methods: a `factory` method and an `strlen` method.  Stricly speaking, the only method that a UDF requires is a `factory` method, which returns another method (in this case `strlen`) that performs the actual computation.  The only requirement for the UDF computation method is that its first argument be `tuple_data`, a dictionary of data that is returned with all tweets (read more about this [here](http://mehack.com/map-of-a-twitter-status-object)).
+In this example, we build the class `StringLength`, which has two methods: a `factory` method and an `strlen` method.  Stricly speaking, the only method that a UDF requires is a `factory` method, which returns another method (in this case `strlen`) that performs the actual computation.  The only requirement for the UDF computation method is that its first argument be `tuple_data`, a dictionary of data that is returned with all tweets (read more about this [here](http://www.scribd.com/doc/30146338/map-of-a-tweet)). 
+
 
 You can include any number of arguments after `tuple_data`.  In our case, we only take one: the string `val` which we wish to take the length of.  Note that when we run the query on the last line of this example, we pass `text` as an argument to `stringlength`---this is the value that `val` will take on.
 
