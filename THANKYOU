@@ -8,3 +8,5 @@ Sanjay Kairam: found bug in connection pooling with sqlite.
 Veck Hsiao: modify the authorization method from BasicAuth to OAuth.
 
 Felix Wong: added username support to the geolocation logic.
+
+TLOshini: Windows support
