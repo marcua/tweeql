@@ -18,7 +18,10 @@ class StatusHandler(object):
 class PrintStatusHandler(StatusHandler):
     def __init__(self, batch_size, delimiter = u"|"):
         super(PrintStatusHandler, self).__init__(batch_size)
-        self.delimiter = delimiter
+        try:
+            self.delimiter = settings.DELIMITER
+        except AttributeError as ae:
+            self.delimiter = delimiter
 
     def handle_statuses(self, statuses):
         td = self.tuple_descriptor
