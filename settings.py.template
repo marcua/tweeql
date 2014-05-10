@@ -13,7 +13,7 @@
 #GEONAMES_USERNAME="yourUserName"
 
 # Delimiter for the SQL output
-#DELIMITER = " | "
+#DELIMITER = u"|"
 
 # set to a database URI according to sqlalchemy's scheme for the database to dump stored tweets into
 DATABASE_URI = "sqlite:///test.db"
