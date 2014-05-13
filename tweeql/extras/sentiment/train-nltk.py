@@ -38,7 +38,7 @@ update_wordcount(word_fd, label_word_fd, smilefile, POSITIVE)
 update_wordcount(word_fd, label_word_fd, frownfile, NEGATIVE)
 
 pos_word_count = label_word_fd[POSITIVE].N()
-neg_word_count = label_word_fd[POSITIVE].N()
+neg_word_count = label_word_fd[NEGATIVE].N()
 total_word_count = pos_word_count + neg_word_count
 
 print "Finding top words"
