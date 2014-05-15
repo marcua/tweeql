@@ -7,6 +7,8 @@ Sanjay Kairam: found bug in connection pooling with sqlite.
 
 Veck Hsiao: modify the authorization method from BasicAuth to OAuth.
 
-Felix Wong: added username support to the geolocation logic.
+Felix Wong: added username support to the geolocation logic, and added a delimiter option to settings.
 
-TLOshini: Windows support
+Oshini Goonetilleke: provided Windows support.
+
+Eugene Wu: found a bug in the sentiment analysis training code.
